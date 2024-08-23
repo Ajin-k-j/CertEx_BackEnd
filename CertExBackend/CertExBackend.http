@@ -1,0 +1,6 @@
+@CertExBackend_HostAddress = http://localhost:5122
+
+GET {{CertExBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
