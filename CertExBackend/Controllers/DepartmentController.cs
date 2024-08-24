@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,66 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentRepository departmentRepository)
+        public DepartmentController(IDepartmentService departmentService)
         {
-            _departmentRepository = departmentRepository;
+            _departmentService = departmentService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Department>> GetAllDepartments()
+        [HttpGet("alldepartments")]
+        public async Task<ActionResult<IEnumerable<DepartmentDto>>> AllDepartments()
         {
-            var departments = _departmentRepository.GetAllDepartments();
+            var departments = await _departmentService.GetAllDepartmentsAsync();
             return Ok(departments);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Department> GetDepartmentById(int id)
+        public async Task<ActionResult<DepartmentDto>> GetDepartmentById(int id)
         {
-            var department = _departmentRepository.GetDepartmentById(id);
+            var department = await _departmentService.GetDepartmentByIdAsync(id);
             if (department == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Department with ID {id} not found." });
             }
             return Ok(department);
         }
 
         [HttpPost]
-        public ActionResult AddDepartment([FromBody] Department department)
+        public async Task<ActionResult> AddDepartment(DepartmentDto departmentDto)
         {
-            _departmentRepository.AddDepartment(department);
-            return CreatedAtAction(nameof(GetDepartmentById), new { id = department.Id }, department);
+            await _departmentService.AddDepartmentAsync(departmentDto);
+            return CreatedAtAction(nameof(GetDepartmentById), new { id = departmentDto.Id }, departmentDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateDepartment(int id, [FromBody] Department department)
+        [HttpPut]
+        public async Task<ActionResult> UpdateDepartment(DepartmentDto departmentDto)
         {
-            var existingDepartment = _departmentRepository.GetDepartmentById(id);
-
+            var existingDepartment = await _departmentService.GetDepartmentByIdAsync(departmentDto.Id);
             if (existingDepartment == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Department with ID {departmentDto.Id} not found." });
             }
 
-            existingDepartment.DepartmentName = department.DepartmentName;
-
-            _departmentRepository.UpdateDepartment(existingDepartment);
-
+            await _departmentService.UpdateDepartmentAsync(departmentDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteDepartment(int id)
+        public async Task<ActionResult> DeleteDepartment(int id)
         {
-            var department = _departmentRepository.GetDepartmentById(id);
-            if (department == null)
+            var existingDepartment = await _departmentService.GetDepartmentByIdAsync(id);
+            if (existingDepartment == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Department with ID {id} not found." });
             }
 
-            _departmentRepository.DeleteDepartment(id);
+            await _departmentService.DeleteDepartmentAsync(id);
             return NoContent();
         }
     }

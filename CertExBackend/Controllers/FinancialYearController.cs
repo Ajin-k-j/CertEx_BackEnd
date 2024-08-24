@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,70 +10,59 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class FinancialYearController : ControllerBase
     {
-        private readonly IFinancialYearRepository _financialYearRepository;
+        private readonly IFinancialYearService _financialYearService;
 
-        public FinancialYearController(IFinancialYearRepository financialYearRepository)
+        public FinancialYearController(IFinancialYearService financialYearService)
         {
-            _financialYearRepository = financialYearRepository;
+            _financialYearService = financialYearService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<FinancialYear>> GetAllFinancialYears()
+        [HttpGet("allfinancialyears")]
+        public async Task<ActionResult<IEnumerable<FinancialYearDto>>> AllFinancialYears()
         {
-            var financialYears = _financialYearRepository.GetAllFinancialYears();
+            var financialYears = await _financialYearService.GetAllFinancialYearsAsync();
             return Ok(financialYears);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<FinancialYear> GetFinancialYearById(int id)
+        public async Task<ActionResult<FinancialYearDto>> GetFinancialYearById(int id)
         {
-            var financialYear = _financialYearRepository.GetFinancialYearById(id);
+            var financialYear = await _financialYearService.GetFinancialYearByIdAsync(id);
             if (financialYear == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"FinancialYear with ID {id} not found." });
             }
             return Ok(financialYear);
         }
 
         [HttpPost]
-        public ActionResult AddFinancialYear([FromBody] FinancialYear financialYear)
+        public async Task<ActionResult> AddFinancialYear(FinancialYearDto financialYearDto)
         {
-            _financialYearRepository.AddFinancialYear(financialYear);
-            return CreatedAtAction(nameof(GetFinancialYearById), new { id = financialYear.Id }, financialYear);
+            await _financialYearService.AddFinancialYearAsync(financialYearDto);
+            return CreatedAtAction(nameof(GetFinancialYearById), new { id = financialYearDto.Id }, financialYearDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateFinancialYear(int id, [FromBody] FinancialYear financialYear)
+        [HttpPut]
+        public async Task<ActionResult> UpdateFinancialYear(FinancialYearDto financialYearDto)
         {
-            var existingFinancialYear = _financialYearRepository.GetFinancialYearById(id);
-
+            var existingFinancialYear = await _financialYearService.GetFinancialYearByIdAsync(financialYearDto.Id);
             if (existingFinancialYear == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"FinancialYear with ID {financialYearDto.Id} not found." });
             }
-
-            existingFinancialYear.FromDate = financialYear.FromDate;
-            existingFinancialYear.ToDate = financialYear.ToDate;
-            existingFinancialYear.Status = financialYear.Status;
-            existingFinancialYear.UpdatedAt = DateTime.UtcNow;
-            existingFinancialYear.UpdatedBy = financialYear.UpdatedBy;
-
-            _financialYearRepository.UpdateFinancialYear(existingFinancialYear);
-
+            await _financialYearService.UpdateFinancialYearAsync(financialYearDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteFinancialYear(int id)
+        public async Task<ActionResult> DeleteFinancialYear(int id)
         {
-            var financialYear = _financialYearRepository.GetFinancialYearById(id);
-            if (financialYear == null)
+            var existingFinancialYear = await _financialYearService.GetFinancialYearByIdAsync(id);
+            if (existingFinancialYear == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"FinancialYear with ID {id} not found." });
             }
-
-            _financialYearRepository.DeleteFinancialYear(id);
+            await _financialYearService.DeleteFinancialYearAsync(id);
             return NoContent();
         }
     }

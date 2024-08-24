@@ -1,81 +1,66 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class AwsAdminController : ControllerBase
     {
-        private readonly IAwsAdminRepository _awsAdminRepository;
+        private readonly IAwsAdminService _awsAdminService;
 
-        public AwsAdminController(IAwsAdminRepository awsAdminRepository)
+        public AwsAdminController(IAwsAdminService awsAdminService)
         {
-            _awsAdminRepository = awsAdminRepository;
+            _awsAdminService = awsAdminService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<AwsAdmin>> GetAllAwsAdmins()
+        [HttpGet("allawsadmins")]
+        public async Task<IActionResult> AllAwsAdmins()
         {
-            var awsAdmins = _awsAdminRepository.GetAllAwsAdmins();
+            var awsAdmins = await _awsAdminService.GetAllAwsAdminsAsync();
             return Ok(awsAdmins);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<AwsAdmin> GetAwsAdminById(int id)
+        public async Task<IActionResult> GetAwsAdminById(int id)
         {
-            var awsAdmin = _awsAdminRepository.GetAwsAdminById(id);
+            var awsAdmin = await _awsAdminService.GetAwsAdminByIdAsync(id);
             if (awsAdmin == null)
             {
-                return NotFound();
+                return NotFound(new { Message = "AwsAdmin not found" });
             }
             return Ok(awsAdmin);
         }
 
         [HttpPost]
-        public ActionResult AddAwsAdmin([FromBody] AwsAdmin awsAdmin)
+        public async Task<IActionResult> AddAwsAdmin([FromBody] AwsAdminDto awsAdminDto)
         {
-            if (awsAdmin == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-
-            _awsAdminRepository.AddAwsAdmin(awsAdmin);
-            return CreatedAtAction(nameof(GetAwsAdminById), new { id = awsAdmin.Id }, awsAdmin);
+            await _awsAdminService.AddAwsAdminAsync(awsAdminDto);
+            return CreatedAtAction(nameof(GetAwsAdminById), new { id = awsAdminDto.Id }, awsAdminDto);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateAwsAdmin(int id, [FromBody] AwsAdmin awsAdmin)
+        public async Task<IActionResult> UpdateAwsAdmin(int id, [FromBody] AwsAdminDto awsAdminDto)
         {
-            var existingAwsAdmin = _awsAdminRepository.GetAwsAdminById(id);
-
-            if (existingAwsAdmin == null)
+            if (id != awsAdminDto.Id)
             {
-                return NotFound();
+                return BadRequest(new { Message = "Id mismatch" });
             }
-
-            existingAwsAdmin.Credentials = awsAdmin.Credentials;
-            existingAwsAdmin.Description = awsAdmin.Description;
-            existingAwsAdmin.UpdatedAt = DateTime.UtcNow;
-            existingAwsAdmin.UpdatedBy = awsAdmin.UpdatedBy;
-
-            _awsAdminRepository.UpdateAwsAdmin(existingAwsAdmin);
-
+            await _awsAdminService.UpdateAwsAdminAsync(awsAdminDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteAwsAdmin(int id)
+        public async Task<IActionResult> DeleteAwsAdmin(int id)
         {
-            var awsAdmin = _awsAdminRepository.GetAwsAdminById(id);
-            if (awsAdmin == null)
-            {
-                return NotFound();
-            }
-
-            _awsAdminRepository.DeleteAwsAdmin(id);
+            await _awsAdminService.DeleteAwsAdminAsync(id);
             return NoContent();
         }
     }

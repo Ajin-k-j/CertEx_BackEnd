@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,81 +10,59 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class NominationController : ControllerBase
     {
-        private readonly INominationRepository _nominationRepository;
+        private readonly INominationService _nominationService;
 
-        public NominationController(INominationRepository nominationRepository)
+        public NominationController(INominationService nominationService)
         {
-            _nominationRepository = nominationRepository;
+            _nominationService = nominationService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Nomination>> GetAllNominations()
+        [HttpGet("allnominations")]
+        public async Task<ActionResult<IEnumerable<NominationDto>>> AllNominations()
         {
-            var nominations = _nominationRepository.GetAllNominations();
+            var nominations = await _nominationService.GetAllNominationsAsync();
             return Ok(nominations);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Nomination> GetNominationById(int id)
+        public async Task<ActionResult<NominationDto>> GetNominationById(int id)
         {
-            var nomination = _nominationRepository.GetNominationById(id);
+            var nomination = await _nominationService.GetNominationByIdAsync(id);
             if (nomination == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Nomination with ID {id} not found." });
             }
             return Ok(nomination);
         }
 
         [HttpPost]
-        public ActionResult AddNomination([FromBody] Nomination nomination)
+        public async Task<ActionResult> AddNomination(NominationDto nominationDto)
         {
-            if (nomination == null)
-            {
-                return BadRequest();
-            }
-
-            _nominationRepository.AddNomination(nomination);
-            return CreatedAtAction(nameof(GetNominationById), new { id = nomination.Id }, nomination);
+            await _nominationService.AddNominationAsync(nominationDto);
+            return CreatedAtAction(nameof(GetNominationById), new { id = nominationDto.Id }, nominationDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateNomination(int id, [FromBody] Nomination nomination)
+        [HttpPut]
+        public async Task<ActionResult> UpdateNomination(NominationDto nominationDto)
         {
-            var existingNomination = _nominationRepository.GetNominationById(id);
-
+            var existingNomination = await _nominationService.GetNominationByIdAsync(nominationDto.Id);
             if (existingNomination == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Nomination with ID {nominationDto.Id} not found." });
             }
-
-            existingNomination.CertificationId = nomination.CertificationId;
-            existingNomination.EmployeeId = nomination.EmployeeId;
-            existingNomination.PlannedExamMonth = nomination.PlannedExamMonth;
-            existingNomination.MotivationDescription = nomination.MotivationDescription;
-            existingNomination.ExamDate = nomination.ExamDate;
-            existingNomination.DepartmentApproval = nomination.DepartmentApproval;
-            existingNomination.LndApproval = nomination.LndApproval;
-            existingNomination.ExamStatus = nomination.ExamStatus;
-            existingNomination.NominationStatus = nomination.NominationStatus;
-            existingNomination.UpdatedAt = DateTime.UtcNow;
-            existingNomination.UpdatedBy = nomination.UpdatedBy;
-
-            _nominationRepository.UpdateNomination(existingNomination);
-
+            await _nominationService.UpdateNominationAsync(nominationDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteNomination(int id)
+        public async Task<ActionResult> DeleteNomination(int id)
         {
-            var nomination = _nominationRepository.GetNominationById(id);
-            if (nomination == null)
+            var existingNomination = await _nominationService.GetNominationByIdAsync(id);
+            if (existingNomination == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Nomination with ID {id} not found." });
             }
-
-            _nominationRepository.DeleteNomination(id);
+            await _nominationService.DeleteNominationAsync(id);
             return NoContent();
         }
     }

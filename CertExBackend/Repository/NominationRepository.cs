@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,43 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Nomination> GetAllNominations()
+        public async Task<IEnumerable<Nomination>> GetAllNominationsAsync()
         {
-            return _dbContext.Nominations.ToList();
+            return await _dbContext.Nominations
+                .Include(n => n.CertificationExam)
+                .Include(n => n.Employee)
+                .Include(n => n.ExamDetails)
+                .ToListAsync();
         }
 
-        public Nomination GetNominationById(int id)
+        public async Task<Nomination> GetNominationByIdAsync(int id)
         {
-            return _dbContext.Nominations.Find(id);
+            return await _dbContext.Nominations
+                .Include(n => n.CertificationExam)
+                .Include(n => n.Employee)
+                .Include(n => n.ExamDetails)
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public void AddNomination(Nomination nomination)
+        public async Task AddNominationAsync(Nomination nomination)
         {
             _dbContext.Nominations.Add(nomination);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateNomination(Nomination nomination)
+        public async Task UpdateNominationAsync(Nomination nomination)
         {
             _dbContext.Nominations.Update(nomination);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteNomination(int id)
+        public async Task DeleteNominationAsync(int id)
         {
-            var nomination = _dbContext.Nominations.Find(id);
+            var nomination = await _dbContext.Nominations.FindAsync(id);
             if (nomination != null)
             {
                 _dbContext.Nominations.Remove(nomination);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

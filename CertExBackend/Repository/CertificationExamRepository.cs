@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,39 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<CertificationExam> GetAllCertificationExams()
+        public async Task<IEnumerable<CertificationExam>> GetAllCertificationExamsAsync()
         {
-            return _dbContext.CertificationExams.ToList();
+            return await _dbContext.CertificationExams
+                .Include(e => e.CertificationTags) // Eager loading
+                .ToListAsync();
         }
 
-        public CertificationExam GetCertificationExamById(int id)
+        public async Task<CertificationExam> GetCertificationExamByIdAsync(int id)
         {
-            return _dbContext.CertificationExams.Find(id);
+            return await _dbContext.CertificationExams
+                .Include(e => e.CertificationTags) // Eager loading
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public void AddCertificationExam(CertificationExam exam)
+        public async Task AddCertificationExamAsync(CertificationExam certificationExam)
         {
-            _dbContext.CertificationExams.Add(exam);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationExams.Add(certificationExam);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateCertificationExam(CertificationExam exam)
+        public async Task UpdateCertificationExamAsync(CertificationExam certificationExam)
         {
-            _dbContext.CertificationExams.Update(exam);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationExams.Update(certificationExam);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteCertificationExam(int id)
+        public async Task DeleteCertificationExamAsync(int id)
         {
-            var exam = _dbContext.CertificationExams.Find(id);
-            if (exam != null)
+            var certificationExam = await _dbContext.CertificationExams.FindAsync(id);
+            if (certificationExam != null)
             {
-                _dbContext.CertificationExams.Remove(exam);
-                _dbContext.SaveChanges();
+                _dbContext.CertificationExams.Remove(certificationExam);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

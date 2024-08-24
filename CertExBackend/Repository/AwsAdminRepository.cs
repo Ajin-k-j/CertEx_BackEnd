@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<AwsAdmin> GetAllAwsAdmins()
+        public async Task<IEnumerable<AwsAdmin>> GetAllAwsAdminsAsync()
         {
-            return _dbContext.AwsAdmins.ToList();
+            return await _dbContext.AwsAdmins.ToListAsync();
         }
 
-        public AwsAdmin GetAwsAdminById(int id)
+        public async Task<AwsAdmin> GetAwsAdminByIdAsync(int id)
         {
-            return _dbContext.AwsAdmins.Find(id);
+            return await _dbContext.AwsAdmins.FindAsync(id);
         }
 
-        public void AddAwsAdmin(AwsAdmin awsAdmin)
+        public async Task AddAwsAdminAsync(AwsAdmin awsAdmin)
         {
             _dbContext.AwsAdmins.Add(awsAdmin);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateAwsAdmin(AwsAdmin awsAdmin)
+        public async Task UpdateAwsAdminAsync(AwsAdmin awsAdmin)
         {
             _dbContext.AwsAdmins.Update(awsAdmin);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteAwsAdmin(int id)
+        public async Task DeleteAwsAdminAsync(int id)
         {
-            var awsAdmin = _dbContext.AwsAdmins.Find(id);
+            var awsAdmin = await _dbContext.AwsAdmins.FindAsync(id);
             if (awsAdmin != null)
             {
                 _dbContext.AwsAdmins.Remove(awsAdmin);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

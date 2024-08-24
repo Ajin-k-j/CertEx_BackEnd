@@ -26,22 +26,19 @@ namespace CertExBackend.Model
 
         public DateTime? ExamDate { get; set; }
 
-        [MaxLength(20)]
-        public string DepartmentApproval { get; set; } // Approved, Pending, Rejected
+        public bool IsDepartmentApproved { get; set; } = false; // Default value
+        public bool IsLndApproved { get; set; } = false; // Default value
 
         [MaxLength(20)]
-        public string LndApproval { get; set; } // Approved, Pending, Rejected
+        public string ExamStatus { get; set; } = "Not Completed"; // Default value
 
         [MaxLength(20)]
-        public string ExamStatus { get; set; } // Passed, Failed
+        public string NominationStatus { get; set; } = "Not Completed"; // Default value
 
-        [MaxLength(20)]
-        public string NominationStatus { get; set; } // Complete, Not Completed, Rejected
-
-        public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public string UpdatedBy { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string CreatedBy { get; set; } = "system";
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public string UpdatedBy { get; set; } = "system";
 
         // Navigation properties
         [JsonIgnore]

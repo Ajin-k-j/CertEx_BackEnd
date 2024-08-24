@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,68 +10,59 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleRepository _roleRepository;
+        private readonly IRoleService _roleService;
 
-        public RoleController(IRoleRepository roleRepository)
+        public RoleController(IRoleService roleService)
         {
-            _roleRepository = roleRepository;
+            _roleService = roleService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Role>> GetAllRoles()
+        [HttpGet("allroles")]
+        public async Task<ActionResult<IEnumerable<RoleDto>>> AllRoles()
         {
-            var roles = _roleRepository.GetAllRoles();
+            var roles = await _roleService.GetAllRolesAsync();
             return Ok(roles);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Role> GetRoleById(int id)
+        public async Task<ActionResult<RoleDto>> GetRoleById(int id)
         {
-            var role = _roleRepository.GetRoleById(id);
+            var role = await _roleService.GetRoleByIdAsync(id);
             if (role == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Role with ID {id} not found." });
             }
             return Ok(role);
         }
 
         [HttpPost]
-        public ActionResult AddRole([FromBody] Role role)
+        public async Task<ActionResult> AddRole(RoleDto roleDto)
         {
-            _roleRepository.AddRole(role);
-            return CreatedAtAction(nameof(GetRoleById), new { id = role.Id }, role);
+            await _roleService.AddRoleAsync(roleDto);
+            return CreatedAtAction(nameof(GetRoleById), new { id = roleDto.Id }, roleDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateRole(int id, [FromBody] Role role)
+        [HttpPut]
+        public async Task<ActionResult> UpdateRole(RoleDto roleDto)
         {
-            var existingRole = _roleRepository.GetRoleById(id);
-
+            var existingRole = await _roleService.GetRoleByIdAsync(roleDto.Id);
             if (existingRole == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Role with ID {roleDto.Id} not found." });
             }
-
-            existingRole.Name = role.Name;
-            existingRole.UpdatedAt = DateTime.UtcNow;
-            existingRole.UpdatedBy = role.UpdatedBy;
-
-            _roleRepository.UpdateRole(existingRole);
-
+            await _roleService.UpdateRoleAsync(roleDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteRole(int id)
+        public async Task<ActionResult> DeleteRole(int id)
         {
-            var role = _roleRepository.GetRoleById(id);
-            if (role == null)
+            var existingRole = await _roleService.GetRoleByIdAsync(id);
+            if (existingRole == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Role with ID {id} not found." });
             }
-
-            _roleRepository.DeleteRole(id);
+            await _roleService.DeleteRoleAsync(id);
             return NoContent();
         }
     }

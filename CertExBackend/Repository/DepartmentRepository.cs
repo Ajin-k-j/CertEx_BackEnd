@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Department> GetAllDepartments()
+        public async Task<IEnumerable<Department>> GetAllDepartmentsAsync()
         {
-            return _dbContext.Departments.ToList();
+            return await _dbContext.Departments.ToListAsync();
         }
 
-        public Department GetDepartmentById(int id)
+        public async Task<Department> GetDepartmentByIdAsync(int id)
         {
-            return _dbContext.Departments.Find(id);
+            return await _dbContext.Departments.FindAsync(id);
         }
 
-        public void AddDepartment(Department department)
+        public async Task AddDepartmentAsync(Department department)
         {
             _dbContext.Departments.Add(department);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateDepartment(Department department)
+        public async Task UpdateDepartmentAsync(Department department)
         {
             _dbContext.Departments.Update(department);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteDepartment(int id)
+        public async Task DeleteDepartmentAsync(int id)
         {
-            var department = _dbContext.Departments.Find(id);
+            var department = await _dbContext.Departments.FindAsync(id);
             if (department != null)
             {
                 _dbContext.Departments.Remove(department);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

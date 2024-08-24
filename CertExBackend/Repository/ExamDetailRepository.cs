@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,41 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<ExamDetail> GetAllExamDetails()
+        public async Task<IEnumerable<ExamDetail>> GetAllExamDetailsAsync()
         {
-            return _dbContext.ExamDetails.ToList();
+            return await _dbContext.ExamDetails
+                .Include(ed => ed.Nomination)
+                .Include(ed => ed.MyCertification)
+                .ToListAsync();
         }
 
-        public ExamDetail GetExamDetailById(int id)
+        public async Task<ExamDetail> GetExamDetailByIdAsync(int id)
         {
-            return _dbContext.ExamDetails.Find(id);
+            return await _dbContext.ExamDetails
+                .Include(ed => ed.Nomination)
+                .Include(ed => ed.MyCertification)
+                .FirstOrDefaultAsync(ed => ed.Id == id);
         }
 
-        public void AddExamDetail(ExamDetail examDetail)
+        public async Task AddExamDetailAsync(ExamDetail examDetail)
         {
             _dbContext.ExamDetails.Add(examDetail);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateExamDetail(ExamDetail examDetail)
+        public async Task UpdateExamDetailAsync(ExamDetail examDetail)
         {
             _dbContext.ExamDetails.Update(examDetail);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteExamDetail(int id)
+        public async Task DeleteExamDetailAsync(int id)
         {
-            var examDetail = _dbContext.ExamDetails.Find(id);
+            var examDetail = await _dbContext.ExamDetails.FindAsync(id);
             if (examDetail != null)
             {
                 _dbContext.ExamDetails.Remove(examDetail);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

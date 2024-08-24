@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,47 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Employee> GetAllEmployees()
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
         {
-            return _dbContext.Employees.ToList();
+            return await _dbContext.Employees
+                .Include(e => e.Department)
+                .Include(e => e.Role)
+                .Include(e => e.Manager)
+                .Include(e => e.Subordinates)
+                .Include(e => e.Nominations)
+                .ToListAsync();
         }
 
-        public Employee GetEmployeeById(int id)
+        public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
-            return _dbContext.Employees.Find(id);
+            return await _dbContext.Employees
+                .Include(e => e.Department)
+                .Include(e => e.Role)
+                .Include(e => e.Manager)
+                .Include(e => e.Subordinates)
+                .Include(e => e.Nominations)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public void AddEmployee(Employee employee)
+        public async Task AddEmployeeAsync(Employee employee)
         {
             _dbContext.Employees.Add(employee);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateEmployee(Employee employee)
+        public async Task UpdateEmployeeAsync(Employee employee)
         {
             _dbContext.Employees.Update(employee);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteEmployee(int id)
+        public async Task DeleteEmployeeAsync(int id)
         {
-            var employee = _dbContext.Employees.Find(id);
+            var employee = await _dbContext.Employees.FindAsync(id);
             if (employee != null)
             {
                 _dbContext.Employees.Remove(employee);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

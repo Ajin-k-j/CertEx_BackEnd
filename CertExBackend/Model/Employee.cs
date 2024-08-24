@@ -25,8 +25,7 @@ public class Employee
     [ForeignKey("Role")]
     public int AppRoleId { get; set; }
 
-
-    public bool AwsAccountActive { get; set; } = false; 
+    public bool AwsAccountActive { get; set; } = false;
 
     [Required]
     [EmailAddress]
@@ -39,9 +38,9 @@ public class Employee
     // Self-Referencing Foreign Key
     public int? ManagerId { get; set; }
 
-    public bool IsManager { get; set; } = false; 
+    public bool IsManager { get; set; } = false;
 
-    public bool IsDepartmentHead { get; set; } = false; 
+    public bool IsDepartmentHead { get; set; } = false;
 
     [MaxLength(50)]
     public string Designation { get; set; }

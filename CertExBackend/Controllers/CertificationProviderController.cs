@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,68 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class CertificationProviderController : ControllerBase
     {
-        private readonly ICertificationProviderRepository _certificationProviderRepository;
+        private readonly ICertificationProviderService _certificationProviderService;
 
-        public CertificationProviderController(ICertificationProviderRepository certificationProviderRepository)
+        public CertificationProviderController(ICertificationProviderService certificationProviderService)
         {
-            _certificationProviderRepository = certificationProviderRepository;
+            _certificationProviderService = certificationProviderService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CertificationProvider>> GetAllCertificationProviders()
+        [HttpGet("allcertificationproviders")]
+        public async Task<ActionResult<IEnumerable<CertificationProviderDto>>> AllCertificationProviders()
         {
-            var providers = _certificationProviderRepository.GetAllCertificationProviders();
-            return Ok(providers);
+            var certificationProviders = await _certificationProviderService.GetAllCertificationProvidersAsync();
+            return Ok(certificationProviders);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CertificationProvider> GetCertificationProviderById(int id)
+        public async Task<ActionResult<CertificationProviderDto>> GetCertificationProviderById(int id)
         {
-            var provider = _certificationProviderRepository.GetCertificationProviderById(id);
-            if (provider == null)
+            var certificationProvider = await _certificationProviderService.GetCertificationProviderByIdAsync(id);
+            if (certificationProvider == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationProvider with ID {id} not found." });
             }
-            return Ok(provider);
+            return Ok(certificationProvider);
         }
 
         [HttpPost]
-        public ActionResult AddCertificationProvider([FromBody] CertificationProvider provider)
+        public async Task<ActionResult> AddCertificationProvider(CertificationProviderDto certificationProviderDto)
         {
-            _certificationProviderRepository.AddCertificationProvider(provider);
-            return CreatedAtAction(nameof(GetCertificationProviderById), new { id = provider.Id }, provider);
+            await _certificationProviderService.AddCertificationProviderAsync(certificationProviderDto);
+            return CreatedAtAction(nameof(GetCertificationProviderById), new { id = certificationProviderDto.Id }, certificationProviderDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCertificationProvider(int id, [FromBody] CertificationProvider provider)
+        [HttpPut]
+        public async Task<ActionResult> UpdateCertificationProvider(CertificationProviderDto certificationProviderDto)
         {
-            var existingProvider = _certificationProviderRepository.GetCertificationProviderById(id);
-
+            var existingProvider = await _certificationProviderService.GetCertificationProviderByIdAsync(certificationProviderDto.Id);
             if (existingProvider == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationProvider with ID {certificationProviderDto.Id} not found." });
             }
 
-            existingProvider.ProviderName = provider.ProviderName;
-            existingProvider.UpdatedAt = DateTime.UtcNow;
-            existingProvider.UpdatedBy = provider.UpdatedBy;
-
-            _certificationProviderRepository.UpdateCertificationProvider(existingProvider);
-
+            await _certificationProviderService.UpdateCertificationProviderAsync(certificationProviderDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteCertificationProvider(int id)
+        public async Task<ActionResult> DeleteCertificationProvider(int id)
         {
-            var provider = _certificationProviderRepository.GetCertificationProviderById(id);
-            if (provider == null)
+            var existingProvider = await _certificationProviderService.GetCertificationProviderByIdAsync(id);
+            if (existingProvider == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationProvider with ID {id} not found." });
             }
 
-            _certificationProviderRepository.DeleteCertificationProvider(id);
+            await _certificationProviderService.DeleteCertificationProviderAsync(id);
             return NoContent();
         }
     }
