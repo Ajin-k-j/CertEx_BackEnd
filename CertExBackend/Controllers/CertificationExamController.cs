@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,74 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class CertificationExamController : ControllerBase
     {
-        private readonly ICertificationExamRepository _certificationExamRepository;
+        private readonly ICertificationExamService _certificationExamService;
 
-        public CertificationExamController(ICertificationExamRepository certificationExamRepository)
+        public CertificationExamController(ICertificationExamService certificationExamService)
         {
-            _certificationExamRepository = certificationExamRepository;
+            _certificationExamService = certificationExamService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CertificationExam>> GetAllCertificationExams()
+        [HttpGet("allcertificationexams")]
+        public async Task<ActionResult<IEnumerable<CertificationExamDto>>> AllCertificationExams()
         {
-            var exams = _certificationExamRepository.GetAllCertificationExams();
-            return Ok(exams);
+            var certificationExams = await _certificationExamService.GetAllCertificationExamsAsync();
+            return Ok(certificationExams);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CertificationExam> GetCertificationExamById(int id)
+        public async Task<ActionResult<CertificationExamDto>> GetCertificationExamById(int id)
         {
-            var exam = _certificationExamRepository.GetCertificationExamById(id);
-            if (exam == null)
+            var certificationExam = await _certificationExamService.GetCertificationExamByIdAsync(id);
+            if (certificationExam == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationExam with ID {id} not found." });
             }
-            return Ok(exam);
+            return Ok(certificationExam);
         }
 
         [HttpPost]
-        public ActionResult AddCertificationExam([FromBody] CertificationExam exam)
+        public async Task<ActionResult> AddCertificationExam(CertificationExamDto certificationExamDto)
         {
-            _certificationExamRepository.AddCertificationExam(exam);
-            return CreatedAtAction(nameof(GetCertificationExamById), new { id = exam.Id }, exam);
+            await _certificationExamService.AddCertificationExamAsync(certificationExamDto);
+            return CreatedAtAction(nameof(GetCertificationExamById), new { id = certificationExamDto.Id }, certificationExamDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCertificationExam(int id, [FromBody] CertificationExam exam)
+        [HttpPut]
+        public async Task<ActionResult> UpdateCertificationExam(CertificationExamDto certificationExamDto)
         {
-
-            var existingExam = _certificationExamRepository.GetCertificationExamById(id);
+            var existingExam = await _certificationExamService.GetCertificationExamByIdAsync(certificationExamDto.Id);
             if (existingExam == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationExam with ID {certificationExamDto.Id} not found." });
             }
 
-            // Update properties of the existing exam with the values from the request body
-            existingExam.ProviderId = exam.ProviderId;
-            existingExam.CertificationName = exam.CertificationName;
-            existingExam.NominationStatus = exam.NominationStatus;
-            existingExam.Level = exam.Level;
-            existingExam.Description = exam.Description;
-            existingExam.OfficialLink = exam.OfficialLink;
-            existingExam.CostUsd = exam.CostUsd;
-            existingExam.CostInr = exam.CostInr;
-            existingExam.UpdatedAt = DateTime.UtcNow;
-            existingExam.UpdatedBy = exam.UpdatedBy;
-
-            _certificationExamRepository.UpdateCertificationExam(existingExam);
-            return Ok("Updated Success");
+            await _certificationExamService.UpdateCertificationExamAsync(certificationExamDto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCertificationExam(int id)
+        public async Task<ActionResult> DeleteCertificationExam(int id)
         {
-            var exam = _certificationExamRepository.GetCertificationExamById(id);
-            if (exam == null)
+            var existingExam = await _certificationExamService.GetCertificationExamByIdAsync(id);
+            if (existingExam == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationExam with ID {id} not found." });
             }
 
-            _certificationExamRepository.DeleteCertificationExam(id);
+            await _certificationExamService.DeleteCertificationExamAsync(id);
             return NoContent();
         }
     }

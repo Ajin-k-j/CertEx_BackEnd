@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,39 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<MyCertification> GetAllMyCertifications()
+        public async Task<IEnumerable<MyCertification>> GetAllMyCertificationsAsync()
         {
-            return _dbContext.MyCertifications.ToList();
+            return await _dbContext.MyCertifications
+                .Include(mc => mc.ExamDetails)
+                .ToListAsync();
         }
 
-        public MyCertification GetMyCertificationById(int id)
+        public async Task<MyCertification> GetMyCertificationByIdAsync(int id)
         {
-            return _dbContext.MyCertifications.Find(id);
+            return await _dbContext.MyCertifications
+                .Include(mc => mc.ExamDetails)
+                .FirstOrDefaultAsync(mc => mc.Id == id);
         }
 
-        public void AddMyCertification(MyCertification certification)
+        public async Task AddMyCertificationAsync(MyCertification myCertification)
         {
-            _dbContext.MyCertifications.Add(certification);
-            _dbContext.SaveChanges();
+            _dbContext.MyCertifications.Add(myCertification);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateMyCertification(MyCertification certification)
+        public async Task UpdateMyCertificationAsync(MyCertification myCertification)
         {
-            _dbContext.MyCertifications.Update(certification);
-            _dbContext.SaveChanges();
+            _dbContext.MyCertifications.Update(myCertification);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteMyCertification(int id)
+        public async Task DeleteMyCertificationAsync(int id)
         {
-            var certification = _dbContext.MyCertifications.Find(id);
-            if (certification != null)
+            var myCertification = await _dbContext.MyCertifications.FindAsync(id);
+            if (myCertification != null)
             {
-                _dbContext.MyCertifications.Remove(certification);
-                _dbContext.SaveChanges();
+                _dbContext.MyCertifications.Remove(myCertification);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

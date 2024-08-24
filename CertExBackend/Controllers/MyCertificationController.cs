@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,72 +10,59 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class MyCertificationController : ControllerBase
     {
-        private readonly IMyCertificationRepository _myCertificationRepository;
+        private readonly IMyCertificationService _myCertificationService;
 
-        public MyCertificationController(IMyCertificationRepository myCertificationRepository)
+        public MyCertificationController(IMyCertificationService myCertificationService)
         {
-            _myCertificationRepository = myCertificationRepository;
+            _myCertificationService = myCertificationService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<MyCertification>> GetAllMyCertifications()
+        [HttpGet("allmycertifications")]
+        public async Task<ActionResult<IEnumerable<MyCertificationDto>>> AllMyCertifications()
         {
-            var certifications = _myCertificationRepository.GetAllMyCertifications();
-            return Ok(certifications);
+            var myCertifications = await _myCertificationService.GetAllMyCertificationsAsync();
+            return Ok(myCertifications);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<MyCertification> GetMyCertificationById(int id)
+        public async Task<ActionResult<MyCertificationDto>> GetMyCertificationById(int id)
         {
-            var certification = _myCertificationRepository.GetMyCertificationById(id);
-            if (certification == null)
+            var myCertification = await _myCertificationService.GetMyCertificationByIdAsync(id);
+            if (myCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"MyCertification with ID {id} not found." });
             }
-            return Ok(certification);
+            return Ok(myCertification);
         }
 
         [HttpPost]
-        public ActionResult AddMyCertification([FromBody] MyCertification certification)
+        public async Task<ActionResult> AddMyCertification(MyCertificationDto myCertificationDto)
         {
-            _myCertificationRepository.AddMyCertification(certification);
-            return CreatedAtAction(nameof(GetMyCertificationById), new { id = certification.Id }, certification);
+            await _myCertificationService.AddMyCertificationAsync(myCertificationDto);
+            return CreatedAtAction(nameof(GetMyCertificationById), new { id = myCertificationDto.Id }, myCertificationDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateMyCertification(int id, [FromBody] MyCertification certification)
+        [HttpPut]
+        public async Task<ActionResult> UpdateMyCertification(MyCertificationDto myCertificationDto)
         {
-            var existingCertification = _myCertificationRepository.GetMyCertificationById(id);
-
-            if (existingCertification == null)
+            var existingMyCertification = await _myCertificationService.GetMyCertificationByIdAsync(myCertificationDto.Id);
+            if (existingMyCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"MyCertification with ID {myCertificationDto.Id} not found." });
             }
-
-            existingCertification.Filename = certification.Filename;
-            existingCertification.Url = certification.Url;
-            existingCertification.FromDate = certification.FromDate;
-            existingCertification.ExpiryDate = certification.ExpiryDate;
-            existingCertification.Credentials = certification.Credentials;
-            existingCertification.UpdatedAt = DateTime.UtcNow;
-            existingCertification.UpdatedBy = certification.UpdatedBy;
-
-            _myCertificationRepository.UpdateMyCertification(existingCertification);
-
+            await _myCertificationService.UpdateMyCertificationAsync(myCertificationDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteMyCertification(int id)
+        public async Task<ActionResult> DeleteMyCertification(int id)
         {
-            var certification = _myCertificationRepository.GetMyCertificationById(id);
-            if (certification == null)
+            var existingMyCertification = await _myCertificationService.GetMyCertificationByIdAsync(id);
+            if (existingMyCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"MyCertification with ID {id} not found." });
             }
-
-            _myCertificationRepository.DeleteMyCertification(id);
+            await _myCertificationService.DeleteMyCertificationAsync(id);
             return NoContent();
         }
     }

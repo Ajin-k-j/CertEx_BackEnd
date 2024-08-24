@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,39 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<FinancialYear> GetAllFinancialYears()
+        public async Task<IEnumerable<FinancialYear>> GetAllFinancialYearsAsync()
         {
-            return _dbContext.FinancialYears.ToList();
+            return await _dbContext.FinancialYears
+                .Include(fy => fy.CriticalCertifications)
+                .ToListAsync();
         }
 
-        public FinancialYear GetFinancialYearById(int id)
+        public async Task<FinancialYear> GetFinancialYearByIdAsync(int id)
         {
-            return _dbContext.FinancialYears.Find(id);
+            return await _dbContext.FinancialYears
+                .Include(fy => fy.CriticalCertifications)
+                .FirstOrDefaultAsync(fy => fy.Id == id);
         }
 
-        public void AddFinancialYear(FinancialYear financialYear)
+        public async Task AddFinancialYearAsync(FinancialYear financialYear)
         {
             _dbContext.FinancialYears.Add(financialYear);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateFinancialYear(FinancialYear financialYear)
+        public async Task UpdateFinancialYearAsync(FinancialYear financialYear)
         {
             _dbContext.FinancialYears.Update(financialYear);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteFinancialYear(int id)
+        public async Task DeleteFinancialYearAsync(int id)
         {
-            var financialYear = _dbContext.FinancialYears.Find(id);
+            var financialYear = await _dbContext.FinancialYears.FindAsync(id);
             if (financialYear != null)
             {
                 _dbContext.FinancialYears.Remove(financialYear);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Role> GetAllRoles()
+        public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
-            return _dbContext.Roles.ToList();
+            return await _dbContext.Roles.ToListAsync();
         }
 
-        public Role GetRoleById(int id)
+        public async Task<Role> GetRoleByIdAsync(int id)
         {
-            return _dbContext.Roles.Find(id);
+            return await _dbContext.Roles.FindAsync(id);
         }
 
-        public void AddRole(Role role)
+        public async Task AddRoleAsync(Role role)
         {
             _dbContext.Roles.Add(role);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateRole(Role role)
+        public async Task UpdateRoleAsync(Role role)
         {
             _dbContext.Roles.Update(role);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteRole(int id)
+        public async Task DeleteRoleAsync(int id)
         {
-            var role = _dbContext.Roles.Find(id);
+            var role = await _dbContext.Roles.FindAsync(id);
             if (role != null)
             {
                 _dbContext.Roles.Remove(role);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

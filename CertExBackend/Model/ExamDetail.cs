@@ -19,8 +19,10 @@ namespace CertExBackend.Model
 
         public decimal CostInrWithoutTax { get; set; }
         public decimal CostInrWithTax { get; set; }
+
         [MaxLength(100)]
         public string InvoiceNumber { get; set; }
+
         [MaxLength(200)]
         public string InvoiceUrl { get; set; }
 
@@ -33,10 +35,10 @@ namespace CertExBackend.Model
         [MaxLength(20)]
         public string ReimbursementStatus { get; set; } // Complete, Not Complete
 
-        public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public string UpdatedBy { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string CreatedBy { get; set; } = "system";
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public string UpdatedBy { get; set; } = "system";
 
         // Navigation properties
         [JsonIgnore]

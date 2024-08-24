@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,69 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class CertificationTagController : ControllerBase
     {
-        private readonly ICertificationTagRepository _certificationTagRepository;
+        private readonly ICertificationTagService _certificationTagService;
 
-        public CertificationTagController(ICertificationTagRepository certificationTagRepository)
+        public CertificationTagController(ICertificationTagService certificationTagService)
         {
-            _certificationTagRepository = certificationTagRepository;
+            _certificationTagService = certificationTagService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CertificationTag>> GetAllCertificationTags()
+        [HttpGet("allcertificationtags")]
+        public async Task<ActionResult<IEnumerable<CertificationTagDto>>> AllCertificationTags()
         {
-            var tags = _certificationTagRepository.GetAllCertificationTags();
-            return Ok(tags);
+            var certificationTags = await _certificationTagService.GetAllCertificationTagsAsync();
+            return Ok(certificationTags);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CertificationTag> GetCertificationTagById(int id)
+        public async Task<ActionResult<CertificationTagDto>> GetCertificationTagById(int id)
         {
-            var tag = _certificationTagRepository.GetCertificationTagById(id);
-            if (tag == null)
+            var certificationTag = await _certificationTagService.GetCertificationTagByIdAsync(id);
+            if (certificationTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationTag with ID {id} not found." });
             }
-            return Ok(tag);
+            return Ok(certificationTag);
         }
 
         [HttpPost]
-        public ActionResult AddCertificationTag([FromBody] CertificationTag tag)
+        public async Task<ActionResult> AddCertificationTag(CertificationTagDto certificationTagDto)
         {
-            _certificationTagRepository.AddCertificationTag(tag);
-            return CreatedAtAction(nameof(GetCertificationTagById), new { id = tag.Id }, tag);
+            await _certificationTagService.AddCertificationTagAsync(certificationTagDto);
+            return CreatedAtAction(nameof(GetCertificationTagById), new { id = certificationTagDto.Id }, certificationTagDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCertificationTag(int id, [FromBody] CertificationTag tag)
+        [HttpPut]
+        public async Task<ActionResult> UpdateCertificationTag(CertificationTagDto certificationTagDto)
         {
-            var existingTag = _certificationTagRepository.GetCertificationTagById(id);
-
+            var existingTag = await _certificationTagService.GetCertificationTagByIdAsync(certificationTagDto.Id);
             if (existingTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationTag with ID {certificationTagDto.Id} not found." });
             }
 
-            existingTag.CertificationId = tag.CertificationId;
-            existingTag.CategoryTagId = tag.CategoryTagId;
-            existingTag.UpdatedAt = DateTime.UtcNow;
-            existingTag.UpdatedBy = tag.UpdatedBy;
-
-            _certificationTagRepository.UpdateCertificationTag(existingTag);
-
+            await _certificationTagService.UpdateCertificationTagAsync(certificationTagDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteCertificationTag(int id)
+        public async Task<ActionResult> DeleteCertificationTag(int id)
         {
-            var tag = _certificationTagRepository.GetCertificationTagById(id);
-            if (tag == null)
+            var existingTag = await _certificationTagService.GetCertificationTagByIdAsync(id);
+            if (existingTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CertificationTag with ID {id} not found." });
             }
 
-            _certificationTagRepository.DeleteCertificationTag(id);
+            await _certificationTagService.DeleteCertificationTagAsync(id);
             return NoContent();
         }
     }

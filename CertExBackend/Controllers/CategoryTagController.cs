@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,68 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class CategoryTagController : ControllerBase
     {
-        private readonly ICategoryTagRepository _categoryTagRepository;
+        private readonly ICategoryTagService _categoryTagService;
 
-        public CategoryTagController(ICategoryTagRepository categoryTagRepository)
+        public CategoryTagController(ICategoryTagService categoryTagService)
         {
-            _categoryTagRepository = categoryTagRepository;
+            _categoryTagService = categoryTagService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CategoryTag>> GetAllCategoryTags()
+        [HttpGet("allcategorytags")]
+        public async Task<ActionResult<IEnumerable<CategoryTagDto>>> AllCategoryTags()
         {
-            var tags = _categoryTagRepository.GetAllCategoryTags();
-            return Ok(tags);
+            var categoryTags = await _categoryTagService.GetAllCategoryTagsAsync();
+            return Ok(categoryTags);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CategoryTag> GetCategoryTagById(int id)
+        public async Task<ActionResult<CategoryTagDto>> GetCategoryTagById(int id)
         {
-            var tag = _categoryTagRepository.GetCategoryTagById(id);
-            if (tag == null)
+            var categoryTag = await _categoryTagService.GetCategoryTagByIdAsync(id);
+            if (categoryTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CategoryTag with ID {id} not found." });
             }
-            return Ok(tag);
+            return Ok(categoryTag);
         }
 
         [HttpPost]
-        public ActionResult AddCategoryTag([FromBody] CategoryTag tag)
+        public async Task<ActionResult> AddCategoryTag(CategoryTagDto categoryTagDto)
         {
-            _categoryTagRepository.AddCategoryTag(tag);
-            return CreatedAtAction(nameof(GetCategoryTagById), new { id = tag.Id }, tag);
+            await _categoryTagService.AddCategoryTagAsync(categoryTagDto);
+            return CreatedAtAction(nameof(GetCategoryTagById), new { id = categoryTagDto.Id }, categoryTagDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCategoryTag(int id, [FromBody] CategoryTag tag)
+        [HttpPut]
+        public async Task<ActionResult> UpdateCategoryTag(CategoryTagDto categoryTagDto)
         {
-            var existingTag = _categoryTagRepository.GetCategoryTagById(id);
-
+            var existingTag = await _categoryTagService.GetCategoryTagByIdAsync(categoryTagDto.Id);
             if (existingTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CategoryTag with ID {categoryTagDto.Id} not found." });
             }
 
-            existingTag.CategoryTagName = tag.CategoryTagName;
-            existingTag.UpdatedAt = DateTime.UtcNow;
-            existingTag.UpdatedBy = tag.UpdatedBy;
-
-            _categoryTagRepository.UpdateCategoryTag(existingTag);
-
+            await _categoryTagService.UpdateCategoryTagAsync(categoryTagDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteCategoryTag(int id)
+        public async Task<ActionResult> DeleteCategoryTag(int id)
         {
-            var tag = _categoryTagRepository.GetCategoryTagById(id);
-            if (tag == null)
+            var existingTag = await _categoryTagService.GetCategoryTagByIdAsync(id);
+            if (existingTag == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CategoryTag with ID {id} not found." });
             }
 
-            _categoryTagRepository.DeleteCategoryTag(id);
+            await _categoryTagService.DeleteCategoryTagAsync(id);
             return NoContent();
         }
     }

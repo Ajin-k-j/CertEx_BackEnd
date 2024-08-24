@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<CriticalCertification> GetAllCriticalCertifications()
+        public async Task<IEnumerable<CriticalCertification>> GetAllCriticalCertificationsAsync()
         {
-            return _dbContext.CriticalCertifications.ToList();
+            return await _dbContext.CriticalCertifications.ToListAsync();
         }
 
-        public CriticalCertification GetCriticalCertificationById(int id)
+        public async Task<CriticalCertification> GetCriticalCertificationByIdAsync(int id)
         {
-            return _dbContext.CriticalCertifications.Find(id);
+            return await _dbContext.CriticalCertifications.FindAsync(id);
         }
 
-        public void AddCriticalCertification(CriticalCertification criticalCertification)
+        public async Task AddCriticalCertificationAsync(CriticalCertification criticalCertification)
         {
             _dbContext.CriticalCertifications.Add(criticalCertification);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateCriticalCertification(CriticalCertification criticalCertification)
+        public async Task UpdateCriticalCertificationAsync(CriticalCertification criticalCertification)
         {
             _dbContext.CriticalCertifications.Update(criticalCertification);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteCriticalCertification(int id)
+        public async Task DeleteCriticalCertificationAsync(int id)
         {
-            var criticalCertification = _dbContext.CriticalCertifications.Find(id);
+            var criticalCertification = await _dbContext.CriticalCertifications.FindAsync(id);
             if (criticalCertification != null)
             {
                 _dbContext.CriticalCertifications.Remove(criticalCertification);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

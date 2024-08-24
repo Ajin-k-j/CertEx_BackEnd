@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<CategoryTag> GetAllCategoryTags()
+        public async Task<IEnumerable<CategoryTag>> GetAllCategoryTagsAsync()
         {
-            return _dbContext.CategoryTags.ToList();
+            return await _dbContext.CategoryTags.ToListAsync();
         }
 
-        public CategoryTag GetCategoryTagById(int id)
+        public async Task<CategoryTag> GetCategoryTagByIdAsync(int id)
         {
-            return _dbContext.CategoryTags.Find(id);
+            return await _dbContext.CategoryTags.FindAsync(id);
         }
 
-        public void AddCategoryTag(CategoryTag tag)
+        public async Task AddCategoryTagAsync(CategoryTag categoryTag)
         {
-            _dbContext.CategoryTags.Add(tag);
-            _dbContext.SaveChanges();
+            _dbContext.CategoryTags.Add(categoryTag);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateCategoryTag(CategoryTag tag)
+        public async Task UpdateCategoryTagAsync(CategoryTag categoryTag)
         {
-            _dbContext.CategoryTags.Update(tag);
-            _dbContext.SaveChanges();
+            _dbContext.CategoryTags.Update(categoryTag);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteCategoryTag(int id)
+        public async Task DeleteCategoryTagAsync(int id)
         {
-            var tag = _dbContext.CategoryTags.Find(id);
-            if (tag != null)
+            var categoryTag = await _dbContext.CategoryTags.FindAsync(id);
+            if (categoryTag != null)
             {
-                _dbContext.CategoryTags.Remove(tag);
-                _dbContext.SaveChanges();
+                _dbContext.CategoryTags.Remove(categoryTag);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

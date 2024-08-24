@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,81 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IEmployeeService employeeService)
         {
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Employee>> GetAllEmployees()
+        [HttpGet("allemployees")]
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> AllEmployees()
         {
-            var employees = _employeeRepository.GetAllEmployees();
+            var employees = await _employeeService.GetAllEmployeesAsync();
             return Ok(employees);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Employee> GetEmployeeById(int id)
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeById(int id)
         {
-            var employee = _employeeRepository.GetEmployeeById(id);
+            var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Employee with ID {id} not found." });
             }
             return Ok(employee);
         }
 
         [HttpPost]
-        public ActionResult AddEmployee([FromBody] Employee employee)
+        public async Task<ActionResult> AddEmployee(EmployeeDto employeeDto)
         {
-            if (employee == null)
-            {
-                return BadRequest();
-            }
-
-            _employeeRepository.AddEmployee(employee);
-            return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.Id }, employee);
+            await _employeeService.AddEmployeeAsync(employeeDto);
+            return CreatedAtAction(nameof(GetEmployeeById), new { id = employeeDto.Id }, employeeDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateEmployee(int id, [FromBody] Employee employee)
+        [HttpPut]
+        public async Task<ActionResult> UpdateEmployee(EmployeeDto employeeDto)
         {
-            var existingEmployee = _employeeRepository.GetEmployeeById(id);
-
+            var existingEmployee = await _employeeService.GetEmployeeByIdAsync(employeeDto.Id);
             if (existingEmployee == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Employee with ID {employeeDto.Id} not found." });
             }
 
-            existingEmployee.FirstName = employee.FirstName;
-            existingEmployee.LastName = employee.LastName;
-            existingEmployee.DepartmentId = employee.DepartmentId;
-            existingEmployee.AppRoleId = employee.AppRoleId;
-            existingEmployee.AwsAccountActive = employee.AwsAccountActive;
-            existingEmployee.Email = employee.Email;
-            existingEmployee.SSOEmployeeId = employee.SSOEmployeeId;
-            existingEmployee.ManagerId = employee.ManagerId;
-            existingEmployee.IsManager = employee.IsManager;
-            existingEmployee.IsDepartmentHead = employee.IsDepartmentHead;
-            existingEmployee.Designation = employee.Designation;
-
-            _employeeRepository.UpdateEmployee(existingEmployee);
-
+            await _employeeService.UpdateEmployeeAsync(employeeDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteEmployee(int id)
+        public async Task<ActionResult> DeleteEmployee(int id)
         {
-            var employee = _employeeRepository.GetEmployeeById(id);
-            if (employee == null)
+            var existingEmployee = await _employeeService.GetEmployeeByIdAsync(id);
+            if (existingEmployee == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"Employee with ID {id} not found." });
             }
 
-            _employeeRepository.DeleteEmployee(id);
+            await _employeeService.DeleteEmployeeAsync(id);
             return NoContent();
         }
     }

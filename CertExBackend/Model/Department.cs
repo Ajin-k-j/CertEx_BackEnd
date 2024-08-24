@@ -16,4 +16,5 @@ namespace CertExBackend.Model
         [JsonIgnore]
         public ICollection<Employee> Employees { get; set; }
     }
+
 }

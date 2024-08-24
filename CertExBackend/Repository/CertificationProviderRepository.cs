@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<CertificationProvider> GetAllCertificationProviders()
+        public async Task<IEnumerable<CertificationProvider>> GetAllCertificationProvidersAsync()
         {
-            return _dbContext.CertificationProviders.ToList();
+            return await _dbContext.CertificationProviders.ToListAsync();
         }
 
-        public CertificationProvider GetCertificationProviderById(int id)
+        public async Task<CertificationProvider> GetCertificationProviderByIdAsync(int id)
         {
-            return _dbContext.CertificationProviders.Find(id);
+            return await _dbContext.CertificationProviders.FindAsync(id);
         }
 
-        public void AddCertificationProvider(CertificationProvider provider)
+        public async Task AddCertificationProviderAsync(CertificationProvider certificationProvider)
         {
-            _dbContext.CertificationProviders.Add(provider);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationProviders.Add(certificationProvider);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateCertificationProvider(CertificationProvider provider)
+        public async Task UpdateCertificationProviderAsync(CertificationProvider certificationProvider)
         {
-            _dbContext.CertificationProviders.Update(provider);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationProviders.Update(certificationProvider);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteCertificationProvider(int id)
+        public async Task DeleteCertificationProviderAsync(int id)
         {
-            var provider = _dbContext.CertificationProviders.Find(id);
-            if (provider != null)
+            var certificationProvider = await _dbContext.CertificationProviders.FindAsync(id);
+            if (certificationProvider != null)
             {
-                _dbContext.CertificationProviders.Remove(provider);
-                _dbContext.SaveChanges();
+                _dbContext.CertificationProviders.Remove(certificationProvider);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using CertExBackend.Data;
-using CertExBackend.Interfaces;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace CertExBackend.Repository
 {
@@ -13,35 +14,35 @@ namespace CertExBackend.Repository
             _dbContext = dbContext;
         }
 
-        public IEnumerable<CertificationTag> GetAllCertificationTags()
+        public async Task<IEnumerable<CertificationTag>> GetAllCertificationTagsAsync()
         {
-            return _dbContext.CertificationTags.ToList();
+            return await _dbContext.CertificationTags.ToListAsync();
         }
 
-        public CertificationTag GetCertificationTagById(int id)
+        public async Task<CertificationTag> GetCertificationTagByIdAsync(int id)
         {
-            return _dbContext.CertificationTags.Find(id);
+            return await _dbContext.CertificationTags.FindAsync(id);
         }
 
-        public void AddCertificationTag(CertificationTag tag)
+        public async Task AddCertificationTagAsync(CertificationTag certificationTag)
         {
-            _dbContext.CertificationTags.Add(tag);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationTags.Add(certificationTag);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateCertificationTag(CertificationTag tag)
+        public async Task UpdateCertificationTagAsync(CertificationTag certificationTag)
         {
-            _dbContext.CertificationTags.Update(tag);
-            _dbContext.SaveChanges();
+            _dbContext.CertificationTags.Update(certificationTag);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void DeleteCertificationTag(int id)
+        public async Task DeleteCertificationTagAsync(int id)
         {
-            var tag = _dbContext.CertificationTags.Find(id);
-            if (tag != null)
+            var certificationTag = await _dbContext.CertificationTags.FindAsync(id);
+            if (certificationTag != null)
             {
-                _dbContext.CertificationTags.Remove(tag);
-                _dbContext.SaveChanges();
+                _dbContext.CertificationTags.Remove(certificationTag);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

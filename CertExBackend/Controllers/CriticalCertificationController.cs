@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,70 +10,61 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class CriticalCertificationController : ControllerBase
     {
-        private readonly ICriticalCertificationRepository _criticalCertificationRepository;
+        private readonly ICriticalCertificationService _criticalCertificationService;
 
-        public CriticalCertificationController(ICriticalCertificationRepository criticalCertificationRepository)
+        public CriticalCertificationController(ICriticalCertificationService criticalCertificationService)
         {
-            _criticalCertificationRepository = criticalCertificationRepository;
+            _criticalCertificationService = criticalCertificationService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CriticalCertification>> GetAllCriticalCertifications()
+        [HttpGet("allcriticalcertifications")]
+        public async Task<ActionResult<IEnumerable<CriticalCertificationDto>>> AllCriticalCertifications()
         {
-            var certifications = _criticalCertificationRepository.GetAllCriticalCertifications();
-            return Ok(certifications);
+            var criticalCertifications = await _criticalCertificationService.GetAllCriticalCertificationsAsync();
+            return Ok(criticalCertifications);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<CriticalCertification> GetCriticalCertificationById(int id)
+        public async Task<ActionResult<CriticalCertificationDto>> GetCriticalCertificationById(int id)
         {
-            var certification = _criticalCertificationRepository.GetCriticalCertificationById(id);
-            if (certification == null)
+            var criticalCertification = await _criticalCertificationService.GetCriticalCertificationByIdAsync(id);
+            if (criticalCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CriticalCertification with ID {id} not found." });
             }
-            return Ok(certification);
+            return Ok(criticalCertification);
         }
 
         [HttpPost]
-        public ActionResult AddCriticalCertification([FromBody] CriticalCertification certification)
+        public async Task<ActionResult> AddCriticalCertification(CriticalCertificationDto criticalCertificationDto)
         {
-            _criticalCertificationRepository.AddCriticalCertification(certification);
-            return CreatedAtAction(nameof(GetCriticalCertificationById), new { id = certification.Id }, certification);
+            await _criticalCertificationService.AddCriticalCertificationAsync(criticalCertificationDto);
+            return CreatedAtAction(nameof(GetCriticalCertificationById), new { id = criticalCertificationDto.Id }, criticalCertificationDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCriticalCertification(int id, [FromBody] CriticalCertification certification)
+        [HttpPut]
+        public async Task<ActionResult> UpdateCriticalCertification(CriticalCertificationDto criticalCertificationDto)
         {
-            var existingCertification = _criticalCertificationRepository.GetCriticalCertificationById(id);
-
+            var existingCertification = await _criticalCertificationService.GetCriticalCertificationByIdAsync(criticalCertificationDto.Id);
             if (existingCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CriticalCertification with ID {criticalCertificationDto.Id} not found." });
             }
 
-            existingCertification.CertificationId = certification.CertificationId;
-            existingCertification.FinancialYearId = certification.FinancialYearId;
-            existingCertification.RequiredCount = certification.RequiredCount;
-            existingCertification.UpdatedAt = DateTime.UtcNow;
-            existingCertification.UpdatedBy = certification.UpdatedBy;
-
-            _criticalCertificationRepository.UpdateCriticalCertification(existingCertification);
-
+            await _criticalCertificationService.UpdateCriticalCertificationAsync(criticalCertificationDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteCriticalCertification(int id)
+        public async Task<ActionResult> DeleteCriticalCertification(int id)
         {
-            var certification = _criticalCertificationRepository.GetCriticalCertificationById(id);
-            if (certification == null)
+            var existingCertification = await _criticalCertificationService.GetCriticalCertificationByIdAsync(id);
+            if (existingCertification == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"CriticalCertification with ID {id} not found." });
             }
 
-            _criticalCertificationRepository.DeleteCriticalCertification(id);
+            await _criticalCertificationService.DeleteCriticalCertificationAsync(id);
             return NoContent();
         }
     }

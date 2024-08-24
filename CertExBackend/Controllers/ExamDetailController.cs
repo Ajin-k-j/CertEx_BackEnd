@@ -1,5 +1,7 @@
-﻿using CertExBackend.Interfaces;
+﻿using CertExBackend.DTOs;
 using CertExBackend.Model;
+using CertExBackend.Repository.IRepository;
+using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertExBackend.Controllers
@@ -8,76 +10,59 @@ namespace CertExBackend.Controllers
     [Route("api/[controller]")]
     public class ExamDetailController : ControllerBase
     {
-        private readonly IExamDetailRepository _examDetailRepository;
+        private readonly IExamDetailService _examDetailService;
 
-        public ExamDetailController(IExamDetailRepository examDetailRepository)
+        public ExamDetailController(IExamDetailService examDetailService)
         {
-            _examDetailRepository = examDetailRepository;
+            _examDetailService = examDetailService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<ExamDetail>> GetAllExamDetails()
+        [HttpGet("allexamdetails")]
+        public async Task<ActionResult<IEnumerable<ExamDetailDto>>> AllExamDetails()
         {
-            var examDetails = _examDetailRepository.GetAllExamDetails();
+            var examDetails = await _examDetailService.GetAllExamDetailsAsync();
             return Ok(examDetails);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ExamDetail> GetExamDetailById(int id)
+        public async Task<ActionResult<ExamDetailDto>> GetExamDetailById(int id)
         {
-            var examDetail = _examDetailRepository.GetExamDetailById(id);
+            var examDetail = await _examDetailService.GetExamDetailByIdAsync(id);
             if (examDetail == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"ExamDetail with ID {id} not found." });
             }
             return Ok(examDetail);
         }
 
         [HttpPost]
-        public ActionResult AddExamDetail([FromBody] ExamDetail examDetail)
+        public async Task<ActionResult> AddExamDetail(ExamDetailDto examDetailDto)
         {
-            _examDetailRepository.AddExamDetail(examDetail);
-            return CreatedAtAction(nameof(GetExamDetailById), new { id = examDetail.Id }, examDetail);
+            await _examDetailService.AddExamDetailAsync(examDetailDto);
+            return CreatedAtAction(nameof(GetExamDetailById), new { id = examDetailDto.Id }, examDetailDto);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateExamDetail(int id, [FromBody] ExamDetail examDetail)
+        [HttpPut]
+        public async Task<ActionResult> UpdateExamDetail(ExamDetailDto examDetailDto)
         {
-            var existingExamDetail = _examDetailRepository.GetExamDetailById(id);
-
+            var existingExamDetail = await _examDetailService.GetExamDetailByIdAsync(examDetailDto.Id);
             if (existingExamDetail == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"ExamDetail with ID {examDetailDto.Id} not found." });
             }
-
-            existingExamDetail.NominationId = examDetail.NominationId;
-            existingExamDetail.MyCertificationId = examDetail.MyCertificationId;
-            existingExamDetail.CostInrWithoutTax = examDetail.CostInrWithoutTax;
-            existingExamDetail.CostInrWithTax = examDetail.CostInrWithTax;
-            existingExamDetail.InvoiceNumber = examDetail.InvoiceNumber;
-            existingExamDetail.InvoiceUrl = examDetail.InvoiceUrl;
-            existingExamDetail.UploadCertificateStatus = examDetail.UploadCertificateStatus;
-            existingExamDetail.SkillMatrixStatus = examDetail.SkillMatrixStatus;
-            existingExamDetail.ReimbursementStatus = examDetail.ReimbursementStatus;
-            existingExamDetail.UpdatedAt = DateTime.UtcNow;
-            existingExamDetail.UpdatedBy = examDetail.UpdatedBy;
-
-            _examDetailRepository.UpdateExamDetail(existingExamDetail);
-
+            await _examDetailService.UpdateExamDetailAsync(examDetailDto);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult DeleteExamDetail(int id)
+        public async Task<ActionResult> DeleteExamDetail(int id)
         {
-            var examDetail = _examDetailRepository.GetExamDetailById(id);
-            if (examDetail == null)
+            var existingExamDetail = await _examDetailService.GetExamDetailByIdAsync(id);
+            if (existingExamDetail == null)
             {
-                return NotFound();
+                return NotFound(new { Message = $"ExamDetail with ID {id} not found." });
             }
-
-            _examDetailRepository.DeleteExamDetail(id);
+            await _examDetailService.DeleteExamDetailAsync(id);
             return NoContent();
         }
     }
