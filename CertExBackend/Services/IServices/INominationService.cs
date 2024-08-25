@@ -6,8 +6,10 @@ namespace CertExBackend.Services.IServices
     {
         Task<IEnumerable<NominationDto>> GetAllNominationsAsync();
         Task<NominationDto> GetNominationByIdAsync(int id);
-        Task AddNominationAsync(NominationDto nominationDto);
+        Task AddNominationAsync(NominationCreateDto nominationCreateDto);
         Task UpdateNominationAsync(NominationDto nominationDto);
         Task DeleteNominationAsync(int id);
+        Task ApproveDepartmentAsync(int id);
+        Task ApproveLndAsync(int id);
     }
 }

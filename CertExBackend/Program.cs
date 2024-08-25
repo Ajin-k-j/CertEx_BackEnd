@@ -58,6 +58,8 @@ builder.Services.AddScoped<IFinancialYearRepository, FinancialYearRepository>();
 builder.Services.AddScoped<ICriticalCertificationRepository, CriticalCertificationRepository>();
 builder.Services.AddScoped<IAwsAdminRepository, AwsAdminRepository>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // Register Services with Dependency Injection
 builder.Services.AddScoped<IAwsAdminService, AwsAdminService>();

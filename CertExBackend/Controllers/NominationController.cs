@@ -36,34 +36,95 @@ namespace CertExBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddNomination(NominationDto nominationDto)
+        public async Task<ActionResult> AddNomination(NominationCreateDto nominationCreateDto)
         {
-            await _nominationService.AddNominationAsync(nominationDto);
-            return CreatedAtAction(nameof(GetNominationById), new { id = nominationDto.Id }, nominationDto);
+            if (nominationCreateDto == null)
+            {
+                return BadRequest("Nomination data is required.");
+            }
+
+            try
+            {
+                await _nominationService.AddNominationAsync(nominationCreateDto);
+                return CreatedAtAction(nameof(GetNominationById), new { id = nominationCreateDto.Id }, nominationCreateDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpPut]
         public async Task<ActionResult> UpdateNomination(NominationDto nominationDto)
         {
+            if (nominationDto == null)
+            {
+                return BadRequest("Nomination data is required.");
+            }
+
             var existingNomination = await _nominationService.GetNominationByIdAsync(nominationDto.Id);
             if (existingNomination == null)
             {
                 return NotFound(new { Message = $"Nomination with ID {nominationDto.Id} not found." });
             }
-            await _nominationService.UpdateNominationAsync(nominationDto);
-            return NoContent();
+
+            try
+            {
+                await _nominationService.UpdateNominationAsync(nominationDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("approve/department/{id}")]
+        public async Task<ActionResult> ApproveDepartment(int id)
+        {
+            try
+            {
+                await _nominationService.ApproveDepartmentAsync(id);
+                return Ok("Nomination Approved by Department");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("approve/lnd/{id}")]
+        public async Task<ActionResult> ApproveLnd(int id)
+        {
+            try
+            {
+                await _nominationService.ApproveLndAsync(id);
+                return Ok("Nomination Approved by L&D");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteNomination(int id)
         {
-            var existingNomination = await _nominationService.GetNominationByIdAsync(id);
-            if (existingNomination == null)
+            try
             {
-                return NotFound(new { Message = $"Nomination with ID {id} not found." });
+                var existingNomination = await _nominationService.GetNominationByIdAsync(id);
+                if (existingNomination == null)
+                {
+                    return NotFound(new { Message = $"Nomination with ID {id} not found." });
+                }
+
+                await _nominationService.DeleteNominationAsync(id);
+                return NoContent();
             }
-            await _nominationService.DeleteNominationAsync(id);
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

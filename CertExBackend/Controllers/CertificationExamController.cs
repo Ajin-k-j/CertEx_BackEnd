@@ -36,22 +36,23 @@ namespace CertExBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddCertificationExam(CertificationExamDto certificationExamDto)
+        public async Task<ActionResult> AddCertificationExam(CertificationExam certificationExam)
         {
-            await _certificationExamService.AddCertificationExamAsync(certificationExamDto);
-            return CreatedAtAction(nameof(GetCertificationExamById), new { id = certificationExamDto.Id }, certificationExamDto);
+            // Assuming you have logic to set CreatedBy and CreatedDate
+            // For example: certificationExam.CreatedBy = GetCurrentUserId();
+            await _certificationExamService.AddCertificationExamAsync(certificationExam);
+            return CreatedAtAction(nameof(GetCertificationExamById), new { id = certificationExam.Id }, certificationExam);
         }
 
         [HttpPut]
-        public async Task<ActionResult> UpdateCertificationExam(CertificationExamDto certificationExamDto)
+        public async Task<ActionResult> UpdateCertificationExam(CertificationExam certificationExam)
         {
-            var existingExam = await _certificationExamService.GetCertificationExamByIdAsync(certificationExamDto.Id);
+            var existingExam = await _certificationExamService.GetCertificationExamByIdAsync(certificationExam.Id);
             if (existingExam == null)
             {
-                return NotFound(new { Message = $"CertificationExam with ID {certificationExamDto.Id} not found." });
+                return NotFound(new { Message = $"CertificationExam with ID {certificationExam.Id} not found." });
             }
-
-            await _certificationExamService.UpdateCertificationExamAsync(certificationExamDto);
+            await _certificationExamService.UpdateCertificationExamAsync(certificationExam);
             return NoContent();
         }
 
