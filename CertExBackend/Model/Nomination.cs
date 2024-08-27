@@ -47,7 +47,7 @@ namespace CertExBackend.Model
         [JsonIgnore]
         public Employee Employee { get; set; }
 
-        // Navigation property for ExamDetails
+
         [JsonIgnore]
         public ICollection<ExamDetail> ExamDetails { get; set; }
     }

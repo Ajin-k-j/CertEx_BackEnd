@@ -42,5 +42,10 @@ namespace CertExBackend.Model
         // Navigation property for CertificationTags
         [JsonIgnore]
         public ICollection<CertificationTag> CertificationTags { get; set; }
+
+
+        [JsonIgnore]
+        public CertificationProvider CertificationProvider { get; set; }
     }
 }
+

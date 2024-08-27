@@ -57,6 +57,15 @@ builder.Services.AddScoped<IMyCertificationRepository, MyCertificationRepository
 builder.Services.AddScoped<IFinancialYearRepository, FinancialYearRepository>();
 builder.Services.AddScoped<ICriticalCertificationRepository, CriticalCertificationRepository>();
 builder.Services.AddScoped<IAwsAdminRepository, AwsAdminRepository>();
+builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
+builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
+builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
+builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
+
+
+
+
+
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -75,6 +84,11 @@ builder.Services.AddScoped<IFinancialYearService, FinancialYearService>();
 builder.Services.AddScoped<IMyCertificationService, MyCertificationService>();
 builder.Services.AddScoped<INominationService, NominationService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ILndBarGraphService, LndBarGraphService>();
+builder.Services.AddScoped<IDuBarGraphService, DuBarGraphService>();
+builder.Services.AddScoped<IAwsBarGraphService, AwsBarGraphService>();
+builder.Services.AddScoped<IUserPendingActionService, UserPendingActionService>();
+
 
 
 // Add controllers to the services container
