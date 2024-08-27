@@ -41,6 +41,7 @@ builder.Services.AddAutoMapper(typeof(ExamDetailProfile));
 builder.Services.AddAutoMapper(typeof(FinancialYearProfile));
 builder.Services.AddAutoMapper(typeof(MyCertificationProfile));
 builder.Services.AddAutoMapper(typeof(NominationProfile));
+builder.Services.AddAutoMapper(typeof(PendingNominationProfile));
 builder.Services.AddAutoMapper(typeof(RoleProfile));
 
 // Register repository services

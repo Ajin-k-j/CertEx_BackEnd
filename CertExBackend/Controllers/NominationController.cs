@@ -79,13 +79,14 @@ namespace CertExBackend.Controllers
             }
         }
 
-        [HttpPut("approve/department/{id}")]
+        [HttpGet("approve/department/{id}")]
         public async Task<ActionResult> ApproveDepartment(int id)
         {
             try
             {
                 await _nominationService.ApproveDepartmentAsync(id);
-                return Ok("Nomination Approved by Department");
+                /*return Ok("Nomination Approved by Department");*/
+                return Redirect($"http://localhost:5173/message?message=Nomination_approved.&success=true");
             }
             catch (Exception ex)
             {
@@ -93,17 +94,75 @@ namespace CertExBackend.Controllers
             }
         }
 
-        [HttpPut("approve/lnd/{id}")]
+        [HttpGet("approve/lnd/{id}")]
         public async Task<ActionResult> ApproveLnd(int id)
         {
             try
             {
                 await _nominationService.ApproveLndAsync(id);
-                return Ok("Nomination Approved by L&D");
+                /*return Ok("Nomination Approved by L&D");*/
+                return Redirect($"http://localhost:5173/message?message=Nomination_approved.&success=true");
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("reject/department/{id}")]
+        public async Task<ActionResult> RejectDepartment(int id)
+        {
+            try
+            {
+                await _nominationService.RejectDepartmentAsync(id);
+                return Redirect($"http://localhost:5173/message?message=Nomination_rejected.&success=true");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("reject/lnd/{id}")]
+        public async Task<ActionResult> RejectLnd(int id)
+        {
+            try
+            {
+                await _nominationService.RejectLndAsync(id);
+                return Redirect($"http://localhost:5173/message?message=Nomination_rejected.&success=true");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet("pendingActions/Lnd")]
+        public async Task<IActionResult> GetPendingLndApprovals()
+        {
+            try
+            {
+                var pendingNominations = await _nominationService.GetPendingLndApprovalsAsync();
+                return Ok(pendingNominations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("pendingActions/Department/{departmentId}")]
+        public async Task<IActionResult> GetPendingDepartmentApprovals(int departmentId)
+        {
+            try
+            {
+                var pendingNominations = await _nominationService.GetPendingDepartmentApprovalsAsync(departmentId);
+                return Ok(pendingNominations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
