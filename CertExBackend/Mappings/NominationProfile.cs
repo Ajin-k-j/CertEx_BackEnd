@@ -10,6 +10,7 @@ namespace CertExBackend.Mappings
         {
             CreateMap<Nomination, NominationDto>();
             CreateMap<NominationDto, Nomination>();
+            CreateMap<NominationCreateDto, Nomination>();
         }
     }
 }

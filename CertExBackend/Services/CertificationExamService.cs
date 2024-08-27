@@ -88,17 +88,40 @@ namespace CertExBackend.Services
             return certificationExamDto;
         }
 
-        public async Task AddCertificationExamAsync(CertificationExamDto certificationExamDto)
+        public async Task AddCertificationExamAsync(CertificationExam certificationExam)
         {
-            var certificationExam = _mapper.Map<CertificationExam>(certificationExamDto);
             await _certificationExamRepository.AddCertificationExamAsync(certificationExam);
         }
 
-        public async Task UpdateCertificationExamAsync(CertificationExamDto certificationExamDto)
+        public async Task UpdateCertificationExamAsync(CertificationExam certificationExam)
         {
-            var certificationExam = _mapper.Map<CertificationExam>(certificationExamDto);
-            await _certificationExamRepository.UpdateCertificationExamAsync(certificationExam);
+            // Fetch the existing entity from the repository
+            var existingExam = await _certificationExamRepository.GetCertificationExamByIdAsync(certificationExam.Id);
+            if (existingExam == null)
+            {
+                throw new ArgumentException($"CertificationExam with ID {certificationExam.Id} not found.");
+            }
+
+            // Update properties of the existing entity with new values
+            existingExam.ProviderId = certificationExam.ProviderId;
+            existingExam.CertificationName = certificationExam.CertificationName;
+            existingExam.NominationStatus = certificationExam.NominationStatus;
+            existingExam.Level = certificationExam.Level;
+            existingExam.Description = certificationExam.Description;
+            existingExam.Views = certificationExam.Views;
+            existingExam.OfficialLink = certificationExam.OfficialLink;
+            existingExam.CostUsd = certificationExam.CostUsd;
+            existingExam.CostInr = certificationExam.CostInr;
+            existingExam.NominationOpenDate = certificationExam.NominationOpenDate;
+            existingExam.NominationCloseDate = certificationExam.NominationCloseDate;
+            existingExam.UpdatedAt = DateTime.UtcNow;
+            existingExam.UpdatedBy = certificationExam.UpdatedBy; 
+
+            // Update the existing entity
+            await _certificationExamRepository.UpdateCertificationExamAsync(existingExam);
         }
+
+
 
         public async Task DeleteCertificationExamAsync(int id)
         {

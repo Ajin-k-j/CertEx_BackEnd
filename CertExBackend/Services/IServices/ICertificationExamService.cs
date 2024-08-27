@@ -1,4 +1,5 @@
 ﻿using CertExBackend.DTOs;
+using CertExBackend.Model;
 
 namespace CertExBackend.Services.IServices
 {
@@ -6,8 +7,8 @@ namespace CertExBackend.Services.IServices
     {
         Task<IEnumerable<CertificationExamDto>> GetAllCertificationExamsAsync();
         Task<CertificationExamDto> GetCertificationExamByIdAsync(int id);
-        Task AddCertificationExamAsync(CertificationExamDto certificationExamDto);
-        Task UpdateCertificationExamAsync(CertificationExamDto certificationExamDto);
+        Task AddCertificationExamAsync(CertificationExam certificationExam);
+        Task UpdateCertificationExamAsync(CertificationExam certificationExam);
         Task DeleteCertificationExamAsync(int id);
     }
 }

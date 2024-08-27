@@ -47,6 +47,7 @@ builder.Services.AddAutoMapper(typeof(ExamDetailProfile));
 builder.Services.AddAutoMapper(typeof(FinancialYearProfile));
 builder.Services.AddAutoMapper(typeof(MyCertificationProfile));
 builder.Services.AddAutoMapper(typeof(NominationProfile));
+builder.Services.AddAutoMapper(typeof(PendingNominationProfile));
 builder.Services.AddAutoMapper(typeof(RoleProfile));
 builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));
 builder.Services.AddAutoMapper(typeof(DepartmentStatsProfile));
@@ -74,6 +75,8 @@ builder.Services.AddScoped<IDepartmentStatsRepository, DepartmentStatsRepository
 builder.Services.AddScoped<IAwsStatsRepository, AwsStatsRepository>();
 builder.Services.AddScoped<IDepartmentNominationRepository, DepartmentNominationRepository>();
 builder.Services.AddScoped<IAwsNominationRepository, AwsNominationRepository>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Register Services with Dependency Injection
