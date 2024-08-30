@@ -43,7 +43,7 @@ namespace CertExBackend.Repository
                 .ThenInclude(e => e.Department)
                 .Include(n => n.CertificationExam)
                 .ThenInclude(ce => ce.CertificationProvider)
-                .Where(n => n.ExamStatus == "Completed" && n.Employee.Department.DepartmentName == "DU1");
+                .Where(n => n.ExamStatus == "Passed" && n.Employee.Department.DepartmentName == "DU1");
 
             if (providerId.HasValue)
             {

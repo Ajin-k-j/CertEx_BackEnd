@@ -43,9 +43,8 @@ namespace CertExBackend.Model
         [JsonIgnore]
         public ICollection<CertificationTag> CertificationTags { get; set; }
 
-
         [JsonIgnore]
         public CertificationProvider CertificationProvider { get; set; }
+
     }
 }
-

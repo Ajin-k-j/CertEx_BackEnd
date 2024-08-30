@@ -91,16 +91,18 @@ namespace CertExBackend.Services
             }
 
             // Send email to department head
-            var departmentHeadEmail = "kalon2k23@gmail.com"; // Replace with actual email retrieval logic
+            var departmentHeadEmail = "sahirnisar4388@gmail.com"; // Replace with actual email retrieval logic
             var departmentHeadSubject = "Nomination Awaiting Approval";
             var departmentHeadBody = EmailTemplates.CreateApprovalRequestEmail(
-                certificationExamDto.CertificationName,
-                $"{employee.FirstName} {employee.LastName}",
-                nomination.PlannedExamMonth,
-                nomination.MotivationDescription,
-                "https://localhost:7015/api/nomination/approve/department/" + nomination.Id,
-                "Department Head"
-            );
+            certificationExamDto.CertificationName,
+            $"{employee.FirstName} {employee.LastName}",
+            nomination.PlannedExamMonth,
+            nomination.MotivationDescription,
+            "https://localhost:7209/api/Nomination/approve/department/" + nomination.Id,
+            "https://localhost:7209/api/Nomination/reject/department/" + nomination.Id,
+            "Department Head"
+        );
+
             await _emailService.SendEmailAsync(departmentHeadEmail, departmentHeadSubject, departmentHeadBody);
         }
 
@@ -115,11 +117,6 @@ namespace CertExBackend.Services
 
                 await _nominationRepository.UpdateNominationAsync(nomination);
             }
-        }
-
-        public async Task DeleteNominationAsync(int id)
-        {
-            await _nominationRepository.DeleteNominationAsync(id);
         }
 
         public async Task ApproveDepartmentAsync(int id)
@@ -144,16 +141,18 @@ namespace CertExBackend.Services
                 var employeeBody = EmailTemplates.CreateStatusUpdateEmail(certificationExamDto.CertificationName, "approved by the Department Head", employee.FirstName);
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
-                var ldEmail = "kalon2k23@gmail.com"; // Replace with actual L&D email retrieval logic
+                var ldEmail = "sahirnisar4388@gmail.com"; // Replace with actual L&D email retrieval logic
                 var ldSubject = "Nomination Awaiting L&D Approval";
                 var ldBody = EmailTemplates.CreateApprovalRequestEmail(
-                    certificationExamDto.CertificationName,
-                    $"{employee.FirstName} {employee.LastName}",
-                    nomination.PlannedExamMonth,
-                    nomination.MotivationDescription,
-                    "https://localhost:7015/api/nomination/approve/lnd/" + nomination.Id,
-                    "L&D"
-                );
+                certificationExamDto.CertificationName,
+                $"{employee.FirstName} {employee.LastName}",
+                nomination.PlannedExamMonth,
+                nomination.MotivationDescription,
+                "https://localhost:7209/api/Nomination/approve/lnd/" + nomination.Id,
+                "https://localhost:7209/api/Nomination/reject/lnd/" + nomination.Id,
+                "L&D"
+            );
+
                 await _emailService.SendEmailAsync(ldEmail, ldSubject, ldBody);
             }
         }
@@ -181,6 +180,86 @@ namespace CertExBackend.Services
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
             }
 
+        }
+
+        public async Task RejectDepartmentAsync(int id)
+        {
+            var nomination = await _nominationRepository.GetNominationByIdAsync(id);
+            if (nomination != null)
+            {
+                nomination.IsDepartmentApproved = false; // Assuming rejecting sets this to false
+                nomination.UpdatedAt = DateTime.UtcNow;
+
+                await _nominationRepository.UpdateNominationAsync(nomination);
+                var employee = await _employeeRepository.GetEmployeeByIdAsync(nomination.EmployeeId);
+                var certificationExamDto = await _certificationExamService.GetCertificationExamByIdAsync(nomination.CertificationId);
+
+                if (employee == null || certificationExamDto == null)
+                {
+                    throw new Exception("Employee or Certification exam not found.");
+                }
+
+                var employeeEmail = employee.Email;
+                var employeeSubject = "Nomination Rejected by Department Head";
+                var employeeBody = EmailTemplates.CreateStatusUpdateEmail(certificationExamDto.CertificationName, "rejected by the Department Head", employee.FirstName);
+                await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
+            }
+        }
+
+        public async Task RejectLndAsync(int id)
+        {
+            var nomination = await _nominationRepository.GetNominationByIdAsync(id);
+            if (nomination != null)
+            {
+                nomination.IsLndApproved = false; // Assuming rejecting sets this to false
+                nomination.UpdatedAt = DateTime.UtcNow;
+
+                await _nominationRepository.UpdateNominationAsync(nomination);
+                var employee = await _employeeRepository.GetEmployeeByIdAsync(nomination.EmployeeId);
+                var certificationExamDto = await _certificationExamService.GetCertificationExamByIdAsync(nomination.CertificationId);
+
+                if (employee == null || certificationExamDto == null)
+                {
+                    throw new Exception("Employee or Certification exam not found.");
+                }
+
+                var employeeEmail = employee.Email;
+                var employeeSubject = "Nomination Rejected by L&D";
+                var employeeBody = EmailTemplates.CreateStatusUpdateEmail(certificationExamDto.CertificationName, "rejected by L&D", employee.FirstName);
+                await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
+            }
+        }
+
+
+        public async Task<IEnumerable<PendingNominationDto>> GetPendingLndApprovalsAsync()
+        {
+            var nominations = await _nominationRepository.GetAllNominationsAsync();
+            var pendingNominations = nominations
+                .Where(n => !n.IsLndApproved)
+                .ToList();
+
+            return _mapper.Map<IEnumerable<PendingNominationDto>>(pendingNominations);
+        }
+
+        public async Task<IEnumerable<PendingNominationDto>> GetPendingDepartmentApprovalsAsync(int departmentId)
+        {
+            var nominations = await _nominationRepository.GetAllNominationsAsync();
+            var employees = await _employeeRepository.GetAllEmployeesAsync();
+            var employeeIdsInDepartment = employees
+                .Where(e => e.DepartmentId == departmentId)
+                .Select(e => e.Id)
+                .ToList();
+
+            var pendingNominations = nominations
+                .Where(n => !n.IsDepartmentApproved && employeeIdsInDepartment.Contains(n.EmployeeId))
+                .ToList();
+
+            return _mapper.Map<IEnumerable<PendingNominationDto>>(pendingNominations);
+        }
+
+        public async Task DeleteNominationAsync(int id)
+        {
+            await _nominationRepository.DeleteNominationAsync(id);
         }
     }
 }

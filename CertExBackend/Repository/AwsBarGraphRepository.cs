@@ -41,7 +41,7 @@ namespace CertExBackend.Repository
                 .ThenInclude(e => e.Department)
                 .Include(n => n.CertificationExam)
                 .ThenInclude(ce => ce.CertificationProvider)
-                .Where(n => n.ExamStatus == "Completed" && n.CertificationExam.CertificationProvider.ProviderName == "AWS");  // Filter for AWS
+                .Where(n => n.ExamStatus == "Passed" && n.CertificationExam.CertificationProvider.ProviderName == "AWS");  // Filter for AWS
 
             if (departmentId.HasValue)
             {

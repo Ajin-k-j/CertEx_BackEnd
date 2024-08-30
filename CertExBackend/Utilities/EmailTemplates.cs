@@ -34,7 +34,7 @@
 ";
         }
 
-        public static string CreateApprovalRequestEmail(string certificationName, string employeeName, string plannedExamMonth, string motivationDescription, string actionUrl, string approverType)
+        public static string CreateApprovalRequestEmail(string certificationName, string employeeName, string plannedExamMonth, string motivationDescription, string approveUrl, string rejectUrl, string approverType)
         {
             return $@"
 <html>
@@ -47,8 +47,8 @@
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
         <p><strong>Motivation:</strong> {motivationDescription}</p>
         <div style='margin-top: 20px;'>
-            <a href='{actionUrl}/approve' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
-            <a href='{actionUrl}/reject' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
+            <a href='{approveUrl}' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
+            <a href='{rejectUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
         </div>
         <p>Thank you,<br>Team CertEx</p>
     </div>
@@ -56,6 +56,7 @@
 </html>
 ";
         }
+
 
         public static string CreateStatusUpdateEmail(string certificationName, string status, string employeeFirstName)
         {
