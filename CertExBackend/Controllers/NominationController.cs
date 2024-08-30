@@ -1,6 +1,4 @@
 ﻿using CertExBackend.DTOs;
-using CertExBackend.Model;
-using CertExBackend.Repository.IRepository;
 using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
