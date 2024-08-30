@@ -6,6 +6,11 @@ using CertExBackend.Services.IServices;
 using CertExBackend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using CertExBackend.Repositories;
+using CertExBackend.Mapping;
+using CertExBackend.DTOs;
+using CertExBackend.Model;
+/*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +34,9 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register AutoMapper with Dependency Injection
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Register AutoMapper with Dependency Injection
 builder.Services.AddAutoMapper(typeof(AwsAdminProfile));
 builder.Services.AddAutoMapper(typeof(CategoryTagProfile));
 builder.Services.AddAutoMapper(typeof(CertificationExamProfile));
@@ -43,6 +51,14 @@ builder.Services.AddAutoMapper(typeof(MyCertificationProfile));
 builder.Services.AddAutoMapper(typeof(NominationProfile));
 builder.Services.AddAutoMapper(typeof(PendingNominationProfile));
 builder.Services.AddAutoMapper(typeof(RoleProfile));
+builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));
+builder.Services.AddAutoMapper(typeof(DepartmentStatsProfile));
+builder.Services.AddAutoMapper(typeof(AwsStatsProfile));
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(AwsNominationProfile).Assembly);
+
+
+
 
 // Register repository services
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -58,6 +74,20 @@ builder.Services.AddScoped<IMyCertificationRepository, MyCertificationRepository
 builder.Services.AddScoped<IFinancialYearRepository, FinancialYearRepository>();
 builder.Services.AddScoped<ICriticalCertificationRepository, CriticalCertificationRepository>();
 builder.Services.AddScoped<IAwsAdminRepository, AwsAdminRepository>();
+builder.Services.AddScoped<IEmployeeCertificationRepository, EmployeeCertificationRepository>();
+builder.Services.AddScoped<IDepartmentStatsRepository, DepartmentStatsRepository>();
+builder.Services.AddScoped<IAwsStatsRepository, AwsStatsRepository>();
+builder.Services.AddScoped<IDepartmentNominationRepository, DepartmentNominationRepository>();
+builder.Services.AddScoped<IAwsNominationRepository, AwsNominationRepository>();
+builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
+builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
+builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
+builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
+
+
+
+
+
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -76,10 +106,16 @@ builder.Services.AddScoped<IFinancialYearService, FinancialYearService>();
 builder.Services.AddScoped<IMyCertificationService, MyCertificationService>();
 builder.Services.AddScoped<INominationService, NominationService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ILndBarGraphService, LndBarGraphService>();
+builder.Services.AddScoped<IDuBarGraphService, DuBarGraphService>();
+builder.Services.AddScoped<IAwsBarGraphService, AwsBarGraphService>();
+builder.Services.AddScoped<IUserPendingActionService, UserPendingActionService>();
+builder.Services.AddScoped<IAwsStatsService, AwsStatsService>();
+builder.Services.AddScoped<IDepartmentStatsService, DepartmentStatsService>();
+builder.Services.AddScoped<IDepartmentNominationService, DepartmentNominationService>();
+builder.Services.AddScoped<IAwsNominationService, AwsNominationService>();
 
 
-// Add controllers to the services container
-builder.Services.AddControllers();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -94,6 +130,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 
 app.UseHttpsRedirection();

@@ -91,7 +91,7 @@ namespace CertExBackend.Services
             }
 
             // Send email to department head
-            var departmentHeadEmail = "kalon2k23@gmail.com"; // Replace with actual email retrieval logic
+            var departmentHeadEmail = "sahirnisar4388@gmail.com"; // Replace with actual email retrieval logic
             var departmentHeadSubject = "Nomination Awaiting Approval";
             var departmentHeadBody = EmailTemplates.CreateApprovalRequestEmail(
             certificationExamDto.CertificationName,
@@ -141,7 +141,7 @@ namespace CertExBackend.Services
                 var employeeBody = EmailTemplates.CreateStatusUpdateEmail(certificationExamDto.CertificationName, "approved by the Department Head", employee.FirstName);
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
-                var ldEmail = "kalon2k23@gmail.com"; // Replace with actual L&D email retrieval logic
+                var ldEmail = "sahirnisar4388@gmail.com"; // Replace with actual L&D email retrieval logic
                 var ldSubject = "Nomination Awaiting L&D Approval";
                 var ldBody = EmailTemplates.CreateApprovalRequestEmail(
                 certificationExamDto.CertificationName,
