@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CertExBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20240824034645_nominationModelChanged")]
-    partial class nominationModelChanged
+    [Migration("20240830154703_manager_user_included")]
+    partial class manager_user_included
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,9 +105,6 @@ namespace CertExBackend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int?>("CertificationProviderId")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("CostInr")
                         .HasColumnType("numeric");
 
@@ -157,7 +154,7 @@ namespace CertExBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CertificationProviderId");
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("CertificationExams");
                 });
@@ -339,7 +336,8 @@ namespace CertExBackend.Migrations
 
                     b.HasIndex("MyCertificationId");
 
-                    b.HasIndex("NominationId");
+                    b.HasIndex("NominationId")
+                        .IsUnique();
 
                     b.ToTable("ExamDetails");
                 });
@@ -441,6 +439,9 @@ namespace CertExBackend.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("DepartmentHeadRemarks")
+                        .HasColumnType("text");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
@@ -456,6 +457,15 @@ namespace CertExBackend.Migrations
 
                     b.Property<bool>("IsLndApproved")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LndRemarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerRecommendation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerRemarks")
+                        .HasColumnType("text");
 
                     b.Property<string>("MotivationDescription")
                         .IsRequired()
@@ -594,9 +604,13 @@ namespace CertExBackend.Migrations
 
             modelBuilder.Entity("CertExBackend.Model.CertificationExam", b =>
                 {
-                    b.HasOne("CertExBackend.Model.CertificationProvider", null)
+                    b.HasOne("CertExBackend.Model.CertificationProvider", "CertificationProvider")
                         .WithMany("CertificationExams")
-                        .HasForeignKey("CertificationProviderId");
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CertificationProvider");
                 });
 
             modelBuilder.Entity("CertExBackend.Model.CertificationTag", b =>
@@ -646,8 +660,8 @@ namespace CertExBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("CertExBackend.Model.Nomination", "Nomination")
-                        .WithMany("ExamDetails")
-                        .HasForeignKey("NominationId")
+                        .WithOne("ExamDetail")
+                        .HasForeignKey("CertExBackend.Model.ExamDetail", "NominationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -733,7 +747,7 @@ namespace CertExBackend.Migrations
 
             modelBuilder.Entity("CertExBackend.Model.Nomination", b =>
                 {
-                    b.Navigation("ExamDetails");
+                    b.Navigation("ExamDetail");
                 });
 
             modelBuilder.Entity("CertExBackend.Model.Role", b =>

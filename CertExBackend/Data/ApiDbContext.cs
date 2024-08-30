@@ -43,6 +43,13 @@ namespace CertExBackend.Data
 
             modelBuilder.Entity<Employee>()
                 .HasIndex(e => e.ManagerId);
+
+            // Configure the relationship for DepartmentHead
+            modelBuilder.Entity<Department>()
+                .HasOne(d => d.DepartmentHead)
+                .WithMany() // Employee does not need to reference back to Departments
+                .HasForeignKey(d => d.DepartmentHeadId)
+                .OnDelete(DeleteBehavior.SetNull); // Optional: Set null on delete
         }
     }
 }
