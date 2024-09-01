@@ -9,6 +9,7 @@ namespace CertExBackend.Mappings
         public CategoryTagProfile()
         {
             CreateMap<CategoryTag, CategoryTagDto>();
+            CreateMap<CategoryTagDto, CategoryTag>();
         }
     }
 }

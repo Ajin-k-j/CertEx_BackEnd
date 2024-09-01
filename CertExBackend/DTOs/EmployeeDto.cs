@@ -8,6 +8,8 @@
         public int DepartmentId { get; set; }
         public int AppRoleId { get; set; }
         public bool AwsAccountActive { get; set; }
+        public string AWSCredentials { get; set; }
+        public string AWSAdminRemarks { get; set; }
         public string Email { get; set; }
         public string SSOEmployeeId { get; set; }
         public int? ManagerId { get; set; }

@@ -19,7 +19,6 @@ namespace CertExBackend.Data
         public DbSet<MyCertification> MyCertifications { get; set; }
         public DbSet<FinancialYear> FinancialYears { get; set; }
         public DbSet<CriticalCertification> CriticalCertifications { get; set; }
-        public DbSet<AwsAdmin> AwsAdmins { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,6 +42,13 @@ namespace CertExBackend.Data
 
             modelBuilder.Entity<Employee>()
                 .HasIndex(e => e.ManagerId);
+
+            // Configure the relationship for DepartmentHead
+            modelBuilder.Entity<Department>()
+                .HasOne(d => d.DepartmentHead)
+                .WithMany() // Employee does not need to reference back to Departments
+                .HasForeignKey(d => d.DepartmentHeadId)
+                .OnDelete(DeleteBehavior.SetNull); // Optional: Set null on delete
         }
     }
 }

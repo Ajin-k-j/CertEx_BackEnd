@@ -15,5 +15,7 @@ namespace CertExBackend.Services.IServices
         Task RejectLndAsync(int id);      
         Task<IEnumerable<PendingNominationDto>> GetPendingLndApprovalsAsync();
         Task<IEnumerable<PendingNominationDto>> GetPendingDepartmentApprovalsAsync(int departmentId);
+
+        Task<bool> ProcessManagerFeedbackAsync(ManagerFeedbackDto feedbackDto);
     }
 }

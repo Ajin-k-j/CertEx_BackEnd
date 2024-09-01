@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CertExBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class manager_user_included : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -136,17 +136,17 @@ namespace CertExBackend.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "text", nullable: true),
-                    CertificationProviderId = table.Column<int>(type: "integer", nullable: true)
+                    UpdatedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CertificationExams", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CertificationExams_CertificationProviders_CertificationProv~",
-                        column: x => x.CertificationProviderId,
+                        name: "FK_CertificationExams_CertificationProviders_ProviderId",
+                        column: x => x.ProviderId,
                         principalTable: "CertificationProviders",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,8 +262,12 @@ namespace CertExBackend.Migrations
                     PlannedExamMonth = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     MotivationDescription = table.Column<string>(type: "text", nullable: false),
                     ExamDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DepartmentApproval = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    LndApproval = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    ManagerRecommendation = table.Column<string>(type: "text", nullable: true),
+                    ManagerRemarks = table.Column<string>(type: "text", nullable: true),
+                    IsDepartmentApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    DepartmentHeadRemarks = table.Column<string>(type: "text", nullable: true),
+                    IsLndApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    LndRemarks = table.Column<string>(type: "text", nullable: true),
                     ExamStatus = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     NominationStatus = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -356,9 +360,9 @@ namespace CertExBackend.Migrations
                 column: "NominationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CertificationExams_CertificationProviderId",
+                name: "IX_CertificationExams_ProviderId",
                 table: "CertificationExams",
-                column: "CertificationProviderId");
+                column: "ProviderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CertificationTags_CategoryTagId",
@@ -415,7 +419,8 @@ namespace CertExBackend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ExamDetails_NominationId",
                 table: "ExamDetails",
-                column: "NominationId");
+                column: "NominationId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Nominations_CertificationId",

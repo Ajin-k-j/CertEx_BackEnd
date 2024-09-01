@@ -37,7 +37,6 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Register AutoMapper with Dependency Injection
-builder.Services.AddAutoMapper(typeof(AwsAdminProfile));
 builder.Services.AddAutoMapper(typeof(CategoryTagProfile));
 builder.Services.AddAutoMapper(typeof(CertificationExamProfile));
 builder.Services.AddAutoMapper(typeof(CertificationProviderProfile));
@@ -73,7 +72,6 @@ builder.Services.AddScoped<IExamDetailRepository, ExamDetailRepository>();
 builder.Services.AddScoped<IMyCertificationRepository, MyCertificationRepository>();
 builder.Services.AddScoped<IFinancialYearRepository, FinancialYearRepository>();
 builder.Services.AddScoped<ICriticalCertificationRepository, CriticalCertificationRepository>();
-builder.Services.AddScoped<IAwsAdminRepository, AwsAdminRepository>();
 builder.Services.AddScoped<IEmployeeCertificationRepository, EmployeeCertificationRepository>();
 builder.Services.AddScoped<IDepartmentStatsRepository, DepartmentStatsRepository>();
 builder.Services.AddScoped<IAwsStatsRepository, AwsStatsRepository>();
@@ -94,7 +92,6 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Register Services with Dependency Injection
-builder.Services.AddScoped<IAwsAdminService, AwsAdminService>();
 builder.Services.AddScoped<ICategoryTagService, CategoryTagService>();
 builder.Services.AddScoped<ICertificationExamService, CertificationExamService>();
 builder.Services.AddScoped<ICertificationProviderService, CertificationProviderService>();
