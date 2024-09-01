@@ -1,4 +1,5 @@
 ﻿using CertExBackend.DTOs;
+using CertExBackend.Model;
 
 namespace CertExBackend.Services.IServices
 {
@@ -6,7 +7,7 @@ namespace CertExBackend.Services.IServices
     {
         Task<IEnumerable<DepartmentDto>> GetAllDepartmentsAsync();
         Task<DepartmentDto> GetDepartmentByIdAsync(int id);
-        Task AddDepartmentAsync(DepartmentDto departmentDto);
+        Task AddDepartmentAsync(Department department);
         Task UpdateDepartmentAsync(DepartmentDto departmentDto);
         Task DeleteDepartmentAsync(int id);
     }

@@ -19,7 +19,7 @@ namespace CertExBackend.Repository
             return await _dbContext.Nominations
                 .Include(n => n.CertificationExam)
                 .Include(n => n.Employee)
-                .Include(n => n.ExamDetails)
+                .Include(n => n.ExamDetail)
                 .ToListAsync();
         }
 
@@ -28,7 +28,7 @@ namespace CertExBackend.Repository
             return await _dbContext.Nominations
                 .Include(n => n.CertificationExam)
                 .Include(n => n.Employee)
-                .Include(n => n.ExamDetails)
+                .Include(n => n.ExamDetail)
                 .FirstOrDefaultAsync(n => n.Id == id);
         }
 

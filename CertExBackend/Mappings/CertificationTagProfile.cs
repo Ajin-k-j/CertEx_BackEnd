@@ -9,6 +9,7 @@ namespace CertExBackend.Mappings
         public CertificationTagProfile()
         {
             CreateMap<CertificationTag, CertificationTagDto>();
+            // Map from CertificationTagDto to CertificationTag
             CreateMap<CertificationTagDto, CertificationTag>();
         }
     }

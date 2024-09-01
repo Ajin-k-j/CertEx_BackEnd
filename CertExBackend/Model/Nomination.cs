@@ -26,14 +26,22 @@ namespace CertExBackend.Model
 
         public DateTime? ExamDate { get; set; }
 
-        public bool IsDepartmentApproved { get; set; } = false; // Default value
-        public bool IsLndApproved { get; set; } = false; // Default value
+        // New fields
+        public string ManagerRecommendation { get; set; } 
+        public string ManagerRemarks { get; set; } 
+
+        // Existing fields
+        public bool IsDepartmentApproved { get; set; } = false; 
+        public string DepartmentHeadRemarks { get; set; } 
+
+        public bool IsLndApproved { get; set; } = false; 
+        public string LndRemarks { get; set; } 
 
         [MaxLength(20)]
-        public string ExamStatus { get; set; } = "Not Completed"; // Default value
+        public string ExamStatus { get; set; } = "Not Completed"; 
 
         [MaxLength(20)]
-        public string NominationStatus { get; set; } = "Not Completed"; // Default value
+        public string NominationStatus { get; set; } = "Not Completed"; 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string CreatedBy { get; set; } = "system";
@@ -47,8 +55,7 @@ namespace CertExBackend.Model
         [JsonIgnore]
         public Employee Employee { get; set; }
 
-
         [JsonIgnore]
-        public ICollection<ExamDetail> ExamDetails { get; set; }
+        public ExamDetail ExamDetail { get; set; } 
     }
 }

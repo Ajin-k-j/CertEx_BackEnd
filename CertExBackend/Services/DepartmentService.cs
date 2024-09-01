@@ -31,9 +31,8 @@ namespace CertExBackend.Services
             return _mapper.Map<DepartmentDto>(department);
         }
 
-        public async Task AddDepartmentAsync(DepartmentDto departmentDto)
+        public async Task AddDepartmentAsync(Department department)
         {
-            var department = _mapper.Map<Department>(departmentDto);
             await _departmentRepository.AddDepartmentAsync(department);
         }
 

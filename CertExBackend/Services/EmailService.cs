@@ -2,6 +2,7 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using System.Threading.Tasks;
 
 namespace CertExBackend.Services
 {
@@ -20,7 +21,24 @@ namespace CertExBackend.Services
             message.From.Add(new MailboxAddress("Nomination System", _configuration["EmailSettings:From"]));
             message.To.Add(new MailboxAddress("", to));
             message.Subject = subject;
+            message.Body = new TextPart("html") { Text = body };
 
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(_configuration["EmailSettings:Host"], int.Parse(_configuration["EmailSettings:Port"]), SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_configuration["EmailSettings:Username"], _configuration["EmailSettings:Password"]);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
+        }
+
+        public async Task SendEmailWithCcAsync(string to, string subject, string body, string cc)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Nomination System", _configuration["EmailSettings:From"]));
+            message.To.Add(new MailboxAddress("", to));
+            message.Cc.Add(new MailboxAddress("", cc)); // Add CC address
+            message.Subject = subject;
             message.Body = new TextPart("html") { Text = body };
 
             using (var client = new SmtpClient())
@@ -32,5 +50,4 @@ namespace CertExBackend.Services
             }
         }
     }
-
 }

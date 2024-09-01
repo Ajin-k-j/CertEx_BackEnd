@@ -20,7 +20,7 @@ public class DepartmentNominationRepository : IDepartmentNominationRepository
             .Include(n => n.Employee)
             .Include(n => n.CertificationExam)
                 .ThenInclude(e => e.CertificationProvider)
-            .Include(n => n.ExamDetails)
+            .Include(n => n.ExamDetail)
             .Where(n => n.Employee.DepartmentId == departmentId)
             .ToListAsync();
 
