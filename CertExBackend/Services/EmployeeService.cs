@@ -2,6 +2,7 @@
 using CertExBackend.DTOs;
 using CertExBackend.Repository.IRepository;
 using CertExBackend.Services.IServices;
+using CertExBackend.Utilities;
 
 namespace CertExBackend.Services
 {
@@ -9,12 +10,15 @@ namespace CertExBackend.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
         public EmployeeService(
-            IEmployeeRepository employeeRepository,
-            IMapper mapper)
+        IEmployeeRepository employeeRepository,
+        IEmailService emailService, // Inject IEmailService
+        IMapper mapper)
         {
             _employeeRepository = employeeRepository;
+            _emailService = emailService; // Initialize IEmailService
             _mapper = mapper;
         }
 
@@ -35,6 +39,37 @@ namespace CertExBackend.Services
             var employee = _mapper.Map<Employee>(employeeDto);
             await _employeeRepository.AddEmployeeAsync(employee);
         }
+
+
+        public async Task UpdateAwsDetailsAsync(int employeeId, string awsCredentials, string awsAdminRemarks)
+        {
+            var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeId);
+            if (employee != null)
+            {
+                employee.AwsAccountActive = true;
+                employee.AWSCredentials = awsCredentials;
+                employee.AWSAdminRemarks = awsAdminRemarks;
+                await _employeeRepository.UpdateEmployeeAsync(employee);
+
+                // Prepare email
+                var employeeEmail = employee.Email;
+                var awsAdminEmail = "ajinkjajin@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                var subject = "Your AWS Credentials and Access Details";
+                var body = EmailTemplates.CreateAwsCredentialsEmail(
+                    awsCredentials,
+                    awsAdminRemarks
+                );
+
+                // Send email
+                await _emailService.SendEmailWithCcAsync(employeeEmail, subject, body, awsAdminEmail);
+
+            }
+            else
+            {
+                throw new Exception("Employee not found.");
+            }
+        }
+
 
         public async Task UpdateEmployeeAsync(EmployeeDto employeeDto)
         {

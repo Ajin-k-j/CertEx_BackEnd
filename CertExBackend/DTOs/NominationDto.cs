@@ -8,6 +8,8 @@
         public string PlannedExamMonth { get; set; }
         public string MotivationDescription { get; set; }
         public DateTime? ExamDate { get; set; }
+        public string ManagerRecommendation { get; set; }
+        public string ManagerRemarks { get; set; }
         public bool IsDepartmentApproved { get; set; }
         public bool IsLndApproved { get; set; }
         public string ExamStatus { get; set; }

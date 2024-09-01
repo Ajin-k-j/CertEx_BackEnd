@@ -19,7 +19,6 @@ namespace CertExBackend.Data
         public DbSet<MyCertification> MyCertifications { get; set; }
         public DbSet<FinancialYear> FinancialYears { get; set; }
         public DbSet<CriticalCertification> CriticalCertifications { get; set; }
-        public DbSet<AwsAdmin> AwsAdmins { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

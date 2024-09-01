@@ -1,8 +1,7 @@
-﻿using CertExBackend.DTOs;
-using CertExBackend.Model;
-using CertExBackend.Repository.IRepository;
+﻿using Microsoft.AspNetCore.Mvc;
 using CertExBackend.Services.IServices;
-using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using CertExBackend.DTOs;
 
 namespace CertExBackend.Controllers
 {
@@ -10,58 +9,37 @@ namespace CertExBackend.Controllers
     [ApiController]
     public class AwsAdminController : ControllerBase
     {
-        private readonly IAwsAdminService _awsAdminService;
+        private readonly IEmployeeService _employeeService;
 
-        public AwsAdminController(IAwsAdminService awsAdminService)
+        public AwsAdminController(IEmployeeService employeeService)
         {
-            _awsAdminService = awsAdminService;
+            _employeeService = employeeService;
         }
 
-        [HttpGet("allawsadmins")]
-        public async Task<IActionResult> AllAwsAdmins()
+        [HttpPost("submit")]
+        public async Task<IActionResult> SubmitAwsDetails([FromBody] AwsAdminDetailsDto awsDetailsDto)
         {
-            var awsAdmins = await _awsAdminService.GetAllAwsAdminsAsync();
-            return Ok(awsAdmins);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAwsAdminById(int id)
-        {
-            var awsAdmin = await _awsAdminService.GetAwsAdminByIdAsync(id);
-            if (awsAdmin == null)
+            if (awsDetailsDto == null)
             {
-                return NotFound(new { Message = "AwsAdmin not found" });
+                return BadRequest("Invalid data.");
             }
-            return Ok(awsAdmin);
-        }
 
-        [HttpPost]
-        public async Task<IActionResult> AddAwsAdmin([FromBody] AwsAdminDto awsAdminDto)
-        {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
-            await _awsAdminService.AddAwsAdminAsync(awsAdminDto);
-            return CreatedAtAction(nameof(GetAwsAdminById), new { id = awsAdminDto.Id }, awsAdminDto);
-        }
+                await _employeeService.UpdateAwsDetailsAsync(
+                    awsDetailsDto.EmployeeId,
+                    awsDetailsDto.AWSCredentials,
+                    awsDetailsDto.AWSAdminRemarks
+                );
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAwsAdmin(int id, [FromBody] AwsAdminDto awsAdminDto)
-        {
-            if (id != awsAdminDto.Id)
+                return Ok("AWS credentials setup submitted successfully.");
+            }
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = "Id mismatch" });
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            await _awsAdminService.UpdateAwsAdminAsync(awsAdminDto);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAwsAdmin(int id)
-        {
-            await _awsAdminService.DeleteAwsAdminAsync(id);
-            return NoContent();
         }
     }
+
+    
 }
