@@ -10,6 +10,8 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +58,7 @@ builder.Services.AddAutoMapper(typeof(DepartmentStatsProfile));
 builder.Services.AddAutoMapper(typeof(AwsStatsProfile));
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(AwsNominationProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(UserActionFlow));
 
 
 
@@ -83,6 +86,7 @@ builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
 builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
 builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
 builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
+builder.Services.AddScoped<IUserActionFlowRepository, UserActionFlowRepository>();
 
 
 
@@ -114,8 +118,14 @@ builder.Services.AddScoped<IAwsStatsService, AwsStatsService>();
 builder.Services.AddScoped<IDepartmentStatsService, DepartmentStatsService>();
 builder.Services.AddScoped<IDepartmentNominationService, DepartmentNominationService>();
 builder.Services.AddScoped<IAwsNominationService, AwsNominationService>();
+builder.Services.AddScoped<IUserActionFlowService, UserActionFlowService>();
 
 
+// Configure File Upload Settings
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 209715200; // 200 MB limit
+});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -136,6 +146,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
+
+app.UseStaticFiles(); // Enable serving static files from wwwroot
 
 app.UseAuthorization();
 
