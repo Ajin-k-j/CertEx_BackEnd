@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
-using CertExBackend.DTOs;
-using CertExBackend.Model;
-using CertExBackend.Repository.IRepository;
-using CertExBackend.Services.IServices;
+﻿using AutoMapper;
 
 public class EmployeeCertificationService : IEmployeeCertificationService
 {
@@ -19,7 +13,11 @@ public class EmployeeCertificationService : IEmployeeCertificationService
 
     public async Task<IEnumerable<EmployeeCertificationDto>> GetCertificationsByEmployeeIdAsync(int employeeId)
     {
-        var certifications = await _repository.GetCertificationsByEmployeeIdAsync(employeeId);
-        return _mapper.Map<IEnumerable<EmployeeCertificationDto>>(certifications);
+        var nominations = await _repository.GetPassedCertificationsByEmployeeIdAsync(employeeId);
+
+        // Map nominations to EmployeeCertificationDto
+        var certificationDtos = _mapper.Map<IEnumerable<EmployeeCertificationDto>>(nominations);
+
+        return certificationDtos;
     }
 }

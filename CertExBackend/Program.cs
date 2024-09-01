@@ -56,7 +56,7 @@ builder.Services.AddAutoMapper(typeof(DepartmentStatsProfile));
 builder.Services.AddAutoMapper(typeof(AwsStatsProfile));
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(AwsNominationProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));
 
 
 
@@ -83,6 +83,7 @@ builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
 builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
 builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
 builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
+builder.Services.AddScoped<IEmployeeCertificationRepository, EmployeeCertificationRepository>();
 
 
 
@@ -114,6 +115,8 @@ builder.Services.AddScoped<IAwsStatsService, AwsStatsService>();
 builder.Services.AddScoped<IDepartmentStatsService, DepartmentStatsService>();
 builder.Services.AddScoped<IDepartmentNominationService, DepartmentNominationService>();
 builder.Services.AddScoped<IAwsNominationService, AwsNominationService>();
+builder.Services.AddScoped<IEmployeeCertificationService, EmployeeCertificationService>();
+
 
 
 

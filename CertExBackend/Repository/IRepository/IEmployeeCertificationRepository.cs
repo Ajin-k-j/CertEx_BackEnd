@@ -1,11 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CertExBackend.Model;
+﻿using CertExBackend.Model;
 
-namespace CertExBackend.Repository.IRepository
+public interface IEmployeeCertificationRepository
 {
-    public interface IEmployeeCertificationRepository
-    {
-        Task<IEnumerable<ExamDetail>> GetCertificationsByEmployeeIdAsync(int employeeId);
-    }
+    Task<IEnumerable<Nomination>> GetPassedCertificationsByEmployeeIdAsync(int employeeId);
 }

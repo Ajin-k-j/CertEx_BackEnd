@@ -1,25 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CertExBackend.Data;
+﻿using CertExBackend.Data;
 using CertExBackend.Model;
-using CertExBackend.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 public class EmployeeCertificationRepository : IEmployeeCertificationRepository
 {
-    private readonly ApiDbContext _dbContext;
+    private readonly ApiDbContext _context;
 
-    public EmployeeCertificationRepository(ApiDbContext dbContext)
+    public EmployeeCertificationRepository(ApiDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<IEnumerable<ExamDetail>> GetCertificationsByEmployeeIdAsync(int employeeId)
+    public async Task<IEnumerable<Nomination>> GetPassedCertificationsByEmployeeIdAsync(int employeeId)
     {
-        return await _dbContext.ExamDetails
-            .Include(ed => ed.MyCertification)
-            .Where(ed => ed.Nomination.EmployeeId == employeeId)
-            .ToListAsync();
+        return await _context.Nominations
+                             .Where(n => n.EmployeeId == employeeId && n.ExamStatus == "Passed")
+                             .Include(n => n.CertificationExam)
+                             .ThenInclude(e => e.CertificationProvider)
+                             .Include(n => n.CertificationExam.CertificationTags)
+                             .ThenInclude(ct => ct.CategoryTag)
+                             .Include(n => n.ExamDetail)
+                             .ThenInclude(ed => ed.MyCertification)
+                             .ToListAsync();
     }
 }

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CertExBackend.DTOs;
-using CertExBackend.Services.IServices;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,10 +12,10 @@ public class EmployeeCertificationController : ControllerBase
     }
 
     [HttpGet("{employeeId}")]
-    public async Task<ActionResult<IEnumerable<EmployeeCertificationDto>>> GetCertificationsByEmployeeId(int employeeId)
+    public async Task<IActionResult> GetCertifications(int employeeId)
     {
         var certifications = await _service.GetCertificationsByEmployeeIdAsync(employeeId);
-        if (certifications == null)
+        if (certifications == null || !certifications.Any())
         {
             return NotFound();
         }
