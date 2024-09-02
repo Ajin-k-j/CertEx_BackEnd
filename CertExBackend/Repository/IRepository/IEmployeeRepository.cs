@@ -9,5 +9,6 @@ namespace CertExBackend.Repository.IRepository
         Task AddEmployeeAsync(Employee employee);
         Task UpdateEmployeeAsync(Employee employee);
         Task DeleteEmployeeAsync(int id);
+        Task<Employee> GetEmployeeByUsernameAsync(string username);
     }
 }
