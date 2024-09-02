@@ -84,7 +84,7 @@ namespace CertExBackend.Services
                 {
                     var managerEmail = manager.Email;
                     var managerName = manager.FirstName;
-                    var managerSubject = "Review Nomination";
+                    var managerSubject = "Review Nomination | CertEx";
 
                     // Generate the approval URL with query parameters
                     var queryParams = new Dictionary<string, string>
@@ -141,7 +141,7 @@ namespace CertExBackend.Services
             }
 
             // Send email to department head
-            var departmentHeadEmail = "ajinkjajin@gmail.com"; // Placeholder; Replace with actual retrieval logic
+            var departmentHeadEmail = "email.certex@gmail.com"; // Placeholder; Replace with actual retrieval logic
             /*var departmentHeadName = "Department Head";*/ // Placeholder; Replace with actual retrieval logic
 
             var approvalUrl = $"https://localhost:7209/api/Nomination/approve/department/{nomination.Id}";
@@ -208,8 +208,8 @@ namespace CertExBackend.Services
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
                 // Send email to L&D team
-                var ldEmail = "ajinkjajin@gmail.com"; // Replace with actual L&D email retrieval logic
-                var ldSubject = "Nomination Awaiting Your Final Approval";
+                var ldEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D email retrieval logic
+                var ldSubject = "Nomination Awaiting L&D Approval";
                 var ldBody = EmailTemplates.CreateLndApprovalEmail(
                     certificationExamDto.CertificationName,
                     $"{employee.FirstName} {employee.LastName}",
@@ -258,7 +258,7 @@ namespace CertExBackend.Services
                 // Check if the certification provider is AWS and employee does not have an active AWS account
                 if (certificationExamDto.ProviderName.Equals("AWS", StringComparison.OrdinalIgnoreCase) && !employee.AwsAccountActive)
                 {
-                    var awsAdminEmail = "ajinkjajin@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                    var awsAdminEmail = "kalon2k23@gmail.com"; // Replace with actual AWS admin email retrieval logic
                     var awsAdminSubject = "AWS Certification: Action Required";
 
                     // Encode query parameters to be URL safe

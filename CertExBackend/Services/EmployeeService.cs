@@ -40,20 +40,26 @@ namespace CertExBackend.Services
             await _employeeRepository.AddEmployeeAsync(employee);
         }
 
+        public async Task<EmployeeDto> GetEmployeeByUsernameAsync(string username)
+        {
+            var employee = await _employeeRepository.GetEmployeeByUsernameAsync(username);
+            return _mapper.Map<EmployeeDto>(employee);
+        }
+
 
         public async Task UpdateAwsDetailsAsync(int employeeId, string awsCredentials, string awsAdminRemarks)
         {
             var employee = await _employeeRepository.GetEmployeeByIdAsync(employeeId);
             if (employee != null)
             {
-                employee.AwsAccountActive = true;
+                /*employee.AwsAccountActive = true;*///after testing uncomment this.
                 employee.AWSCredentials = awsCredentials;
                 employee.AWSAdminRemarks = awsAdminRemarks;
                 await _employeeRepository.UpdateEmployeeAsync(employee);
 
                 // Prepare email
                 var employeeEmail = employee.Email;
-                var awsAdminEmail = "ajinkjajin@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                var awsAdminEmail = "kalon2k23@gmail.com"; // Replace with actual AWS admin email retrieval logic
                 var subject = "Your AWS Credentials and Access Details";
                 var body = EmailTemplates.CreateAwsCredentialsEmail(
                     awsCredentials,

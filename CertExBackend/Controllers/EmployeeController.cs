@@ -35,6 +35,17 @@ namespace CertExBackend.Controllers
             return Ok(employee);
         }
 
+        [HttpGet("verify/{username}")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeByUsername(string username)
+        {
+            var employee = await _employeeService.GetEmployeeByUsernameAsync(username);
+            if (employee == null)
+            {
+                return NotFound(new { Message = $"Employee with username {username} not found." });
+            }
+            return Ok(employee);
+        }
+
         [HttpPost]
         public async Task<ActionResult> AddEmployee(EmployeeDto employeeDto)
         {

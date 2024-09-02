@@ -10,6 +10,8 @@ namespace CertExBackend.Services.IServices
         Task UpdateEmployeeAsync(EmployeeDto employeeDto);
         Task DeleteEmployeeAsync(int id);
 
+        Task<EmployeeDto> GetEmployeeByUsernameAsync(string username);
+
         // New method for updating AWS credentials and admin remarks
         Task UpdateAwsDetailsAsync(int employeeId, string awsCredentials, string awsAdminRemarks);
     }
