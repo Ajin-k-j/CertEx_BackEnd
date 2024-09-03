@@ -12,7 +12,7 @@ namespace CertExBackend.Mapping
                 .ForMember(dest => dest.NominationId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => $"{src.Employee.FirstName} {src.Employee.LastName}"))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Employee.Email))
-                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Employee.Department.DepartmentName)) // Map DepartmentName
+                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Employee.Department.DepartmentName)) 
                 .ForMember(dest => dest.CertificationName, opt => opt.MapFrom(src => src.CertificationExam.CertificationName))
                 .ForMember(dest => dest.Provider, opt => opt.MapFrom(src => src.CertificationExam.CertificationProvider.ProviderName))
                 .ForMember(dest => dest.Level, opt => opt.MapFrom(src => src.CertificationExam.Level))

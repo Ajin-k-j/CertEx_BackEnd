@@ -14,10 +14,7 @@ public class EmployeeCertificationService : IEmployeeCertificationService
     public async Task<IEnumerable<EmployeeCertificationDto>> GetCertificationsByEmployeeIdAsync(int employeeId)
     {
         var nominations = await _repository.GetPassedCertificationsByEmployeeIdAsync(employeeId);
-
-        // Map nominations to EmployeeCertificationDto
-        var certificationDtos = _mapper.Map<IEnumerable<EmployeeCertificationDto>>(nominations);
-
-        return certificationDtos;
+        return _mapper.Map<IEnumerable<EmployeeCertificationDto>>(nominations);
     }
+
 }

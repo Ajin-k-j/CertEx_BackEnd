@@ -17,8 +17,10 @@ public class EmployeeCertificationController : ControllerBase
         var certifications = await _service.GetCertificationsByEmployeeIdAsync(employeeId);
         if (certifications == null || !certifications.Any())
         {
-            return NotFound();
+            return NotFound(new { message = $"No certifications found for employee with ID {employeeId}" });
         }
         return Ok(certifications);
     }
+
+
 }

@@ -49,5 +49,11 @@ namespace CertExBackend.Repository
                 await _dbContext.SaveChangesAsync();
             }
         }
+        public async Task<FinancialYear> GetFinancialYearForDateAsync(DateTime date)
+        {
+            return await _dbContext.FinancialYears
+                .Where(fy => fy.FromDate <= date && fy.ToDate >= date)
+                .FirstOrDefaultAsync();
+        }
     }
 }

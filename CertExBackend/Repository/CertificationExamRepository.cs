@@ -17,14 +17,14 @@ namespace CertExBackend.Repository
         public async Task<IEnumerable<CertificationExam>> GetAllCertificationExamsAsync()
         {
             return await _dbContext.CertificationExams
-                .Include(e => e.CertificationTags) // Eager loading
+                .Include(e => e.CertificationTag) // Eager loading
                 .ToListAsync();
         }
 
         public async Task<CertificationExam> GetCertificationExamByIdAsync(int id)
         {
             return await _dbContext.CertificationExams
-                .Include(e => e.CertificationTags) // Eager loading
+                .Include(e => e.CertificationTag) // Eager loading
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 

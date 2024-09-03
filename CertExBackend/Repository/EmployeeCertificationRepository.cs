@@ -14,13 +14,16 @@ public class EmployeeCertificationRepository : IEmployeeCertificationRepository
     public async Task<IEnumerable<Nomination>> GetPassedCertificationsByEmployeeIdAsync(int employeeId)
     {
         return await _context.Nominations
-                             .Where(n => n.EmployeeId == employeeId && n.ExamStatus == "Passed")
-                             .Include(n => n.CertificationExam)
-                             .ThenInclude(e => e.CertificationProvider)
-                             .Include(n => n.CertificationExam.CertificationTags)
-                             .ThenInclude(ct => ct.CategoryTag)
-                             .Include(n => n.ExamDetail)
-                             .ThenInclude(ed => ed.MyCertification)
-                             .ToListAsync();
+            .Where(n => n.EmployeeId == employeeId && n.ExamStatus == "Passed")
+            .Include(n => n.CertificationExam)
+                .ThenInclude(e => e.CertificationProvider)
+            .Include(n => n.CertificationExam.CertificationTag)
+                .ThenInclude(ct => ct.CategoryTag)
+            .Include(n => n.ExamDetails)
+                .ThenInclude(ed => ed.MyCertification)
+            .ToListAsync();
+        
     }
+
+
 }
