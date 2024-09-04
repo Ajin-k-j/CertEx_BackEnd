@@ -66,17 +66,6 @@ namespace CertExBackend.Controllers
             return Ok();
         }
 
-
-        /*   [HttpPost("{nominationId}/upload-certification")]
-           public async Task<IActionResult> UploadCertification(int nominationId, [FromForm] ActionFlowMyCertificationDto certificationDto)
-           {
-               var result = await _actionFlowService.UploadCertificationAsync(nominationId, certificationDto);
-               if (!result)
-                   return BadRequest("Unable to upload certification");
-
-               return Ok("Certification uploaded successfully");
-           }*/
-
         [HttpPost("upload-certification")]
         public async Task<IActionResult> UploadCertification([FromForm] ActionFlowMyCertificationDto certificationDto)
         {
@@ -89,10 +78,10 @@ namespace CertExBackend.Controllers
 
 
 
-        [HttpPost("{nominationId}/post-invoice-details")]
-        public async Task<IActionResult> PostInvoiceDetails(int nominationId, [FromBody] ActionFlowExamDetailDto userflowexamDetailDto)
+        [HttpPost("post-invoice-details")]
+        public async Task<IActionResult> PostInvoiceDetails([FromForm] ActionFlowExamDetailDto userflowexamDetailDto)
         {
-            var result = await _actionFlowService.PostInvoiceDetailsAsync(nominationId, userflowexamDetailDto);
+            var result = await _actionFlowService.PostInvoiceDetailsAsync(userflowexamDetailDto);
             if (!result)
                 return BadRequest("Unable to post invoice details");
 

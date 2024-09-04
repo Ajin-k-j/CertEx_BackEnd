@@ -10,8 +10,8 @@ namespace CertExBackend.Services.IServices
         Task<bool> SetExamDateAsync(int nominationId, DateTime examDate);
         Task<bool> UpdateExamStatusAsync(int nominationId, string examStatus);
 
-        Task<bool> UploadCertificationAsync(ActionFlowMyCertificationDto certificationDto); 
-        Task<bool> PostInvoiceDetailsAsync(int nominationId, ActionFlowExamDetailDto examDetailDto);
+        Task<bool> UploadCertificationAsync(ActionFlowMyCertificationDto certificationDto);
+        Task<bool> PostInvoiceDetailsAsync(ActionFlowExamDetailDto examDetailDto);
 
         Task DeleteCertificationAsync(int id);
 

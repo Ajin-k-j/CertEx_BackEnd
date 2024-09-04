@@ -11,7 +11,7 @@ namespace CertExBackend.Repository.IRepository
         Task UpdateNominationAsync(Nomination nomination);
 
         Task<bool> UploadCertificationAsync(ActionFlowMyCertificationDto certificationDto);
-        Task<bool> PostInvoiceDetailsAsync(int nominationId, ActionFlowExamDetailDto actionflowexamDetailDto);
+        Task<bool> PostInvoiceDetailsAsync(ActionFlowExamDetailDto actionflowexamDetailDto);
 
         Task<MyCertification> GetByIdAsync(int id);
         Task DeleteAsync(int id);

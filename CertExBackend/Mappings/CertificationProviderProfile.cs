@@ -9,6 +9,7 @@ namespace CertExBackend.Mappings
         public CertificationProviderProfile()
         {
             CreateMap<CertificationProvider, CertificationProviderDto>();
+            CreateMap<CertificationProviderDto, CertificationProvider>();
         }
     }
 }

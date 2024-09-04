@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CertExBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20240824034645_nominationModelChanged")]
-    partial class nominationModelChanged
+    [Migration("20240831095040_AWSAdmin_controller_setup")]
+    partial class AWSAdmin_controller_setup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,43 +24,6 @@ namespace CertExBackend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("CertExBackend.Model.AwsAdmin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Credentials")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<int>("NominationId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NominationId");
-
-                    b.ToTable("AwsAdmins");
-                });
 
             modelBuilder.Entity("CertExBackend.Model.CategoryTag", b =>
                 {
@@ -104,9 +67,6 @@ namespace CertExBackend.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<int?>("CertificationProviderId")
-                        .HasColumnType("integer");
 
                     b.Property<decimal>("CostInr")
                         .HasColumnType("numeric");
@@ -157,7 +117,7 @@ namespace CertExBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CertificationProviderId");
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("CertificationExams");
                 });
@@ -273,12 +233,17 @@ namespace CertExBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("DepartmentHeadId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentHeadId");
 
                     b.ToTable("Departments");
                 });
@@ -339,7 +304,8 @@ namespace CertExBackend.Migrations
 
                     b.HasIndex("MyCertificationId");
 
-                    b.HasIndex("NominationId");
+                    b.HasIndex("NominationId")
+                        .IsUnique();
 
                     b.ToTable("ExamDetails");
                 });
@@ -441,6 +407,9 @@ namespace CertExBackend.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("DepartmentHeadRemarks")
+                        .HasColumnType("text");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
@@ -456,6 +425,15 @@ namespace CertExBackend.Migrations
 
                     b.Property<bool>("IsLndApproved")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LndRemarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerRecommendation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerRemarks")
+                        .HasColumnType("text");
 
                     b.Property<string>("MotivationDescription")
                         .IsRequired()
@@ -523,6 +501,12 @@ namespace CertExBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AWSAdminRemarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AWSCredentials")
+                        .HasColumnType("text");
+
                     b.Property<int>("AppRoleId")
                         .HasColumnType("integer");
 
@@ -581,22 +565,15 @@ namespace CertExBackend.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("CertExBackend.Model.AwsAdmin", b =>
+            modelBuilder.Entity("CertExBackend.Model.CertificationExam", b =>
                 {
-                    b.HasOne("CertExBackend.Model.Nomination", "Nomination")
-                        .WithMany()
-                        .HasForeignKey("NominationId")
+                    b.HasOne("CertExBackend.Model.CertificationProvider", "CertificationProvider")
+                        .WithMany("CertificationExams")
+                        .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Nomination");
-                });
-
-            modelBuilder.Entity("CertExBackend.Model.CertificationExam", b =>
-                {
-                    b.HasOne("CertExBackend.Model.CertificationProvider", null)
-                        .WithMany("CertificationExams")
-                        .HasForeignKey("CertificationProviderId");
+                    b.Navigation("CertificationProvider");
                 });
 
             modelBuilder.Entity("CertExBackend.Model.CertificationTag", b =>
@@ -637,6 +614,16 @@ namespace CertExBackend.Migrations
                     b.Navigation("FinancialYear");
                 });
 
+            modelBuilder.Entity("CertExBackend.Model.Department", b =>
+                {
+                    b.HasOne("Employee", "DepartmentHead")
+                        .WithMany()
+                        .HasForeignKey("DepartmentHeadId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DepartmentHead");
+                });
+
             modelBuilder.Entity("CertExBackend.Model.ExamDetail", b =>
                 {
                     b.HasOne("CertExBackend.Model.MyCertification", "MyCertification")
@@ -646,8 +633,8 @@ namespace CertExBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("CertExBackend.Model.Nomination", "Nomination")
-                        .WithMany("ExamDetails")
-                        .HasForeignKey("NominationId")
+                        .WithOne("ExamDetail")
+                        .HasForeignKey("CertExBackend.Model.ExamDetail", "NominationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -733,7 +720,7 @@ namespace CertExBackend.Migrations
 
             modelBuilder.Entity("CertExBackend.Model.Nomination", b =>
                 {
-                    b.Navigation("ExamDetails");
+                    b.Navigation("ExamDetail");
                 });
 
             modelBuilder.Entity("CertExBackend.Model.Role", b =>

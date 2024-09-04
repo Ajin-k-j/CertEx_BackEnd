@@ -12,6 +12,8 @@ using CertExBackend.DTOs;
 using CertExBackend.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +41,6 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Register AutoMapper with Dependency Injection
-builder.Services.AddAutoMapper(typeof(AwsAdminProfile));
 builder.Services.AddAutoMapper(typeof(CategoryTagProfile));
 builder.Services.AddAutoMapper(typeof(CertificationExamProfile));
 builder.Services.AddAutoMapper(typeof(CertificationProviderProfile));
@@ -76,7 +77,6 @@ builder.Services.AddScoped<IExamDetailRepository, ExamDetailRepository>();
 builder.Services.AddScoped<IMyCertificationRepository, MyCertificationRepository>();
 builder.Services.AddScoped<IFinancialYearRepository, FinancialYearRepository>();
 builder.Services.AddScoped<ICriticalCertificationRepository, CriticalCertificationRepository>();
-builder.Services.AddScoped<IAwsAdminRepository, AwsAdminRepository>();
 builder.Services.AddScoped<IEmployeeCertificationRepository, EmployeeCertificationRepository>();
 builder.Services.AddScoped<IDepartmentStatsRepository, DepartmentStatsRepository>();
 builder.Services.AddScoped<IAwsStatsRepository, AwsStatsRepository>();
@@ -97,7 +97,6 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // Register Services with Dependency Injection
-builder.Services.AddScoped<IAwsAdminService, AwsAdminService>();
 builder.Services.AddScoped<ICategoryTagService, CategoryTagService>();
 builder.Services.AddScoped<ICertificationExamService, CertificationExamService>();
 builder.Services.AddScoped<ICertificationProviderService, CertificationProviderService>();
@@ -130,9 +129,14 @@ builder.Services.Configure<FormOptions>(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations(); // This enables using annotations
+});
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -142,8 +146,156 @@ if (app.Environment.IsDevelopment())
 }
 
 
-
 app.UseHttpsRedirection();
+app.UseRouting();
+app.MapGet("/api/Nomination/{id:int}/IsDepartmentApproved", async (int id, ApiDbContext dbContext) =>
+{
+    var nomination = await dbContext.Nominations.FindAsync(id);
+    if (nomination == null)
+    {
+        return Results.NotFound("Nomination not found");
+    }
+
+    return Results.Ok(nomination.IsDepartmentApproved);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get IsDepartmentApproved status", description: "Returns the IsDepartmentApproved status for a given nomination"))
+.Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+app.MapGet("/api/Nomination/{id:int}/IsLndApproved", async (int id, ApiDbContext dbContext) =>
+{
+    var nomination = await dbContext.Nominations.FindAsync(id);
+    if (nomination == null)
+    {
+        return Results.NotFound("Nomination not found");
+    }
+
+    return Results.Ok(nomination.IsLndApproved);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get IsLndApproved status", description: "Returns the IsLndApproved status for a given nomination"))
+.Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+app.MapGet("/api/ExamDetail/{id:int}/SkillMatrixStatus", async (int id, ApiDbContext dbContext) =>
+{
+    var examDetail = await dbContext.ExamDetails.FindAsync(id);
+    if (examDetail == null)
+    {
+        return Results.NotFound("ExamDetail not found");
+    }
+
+    return Results.Ok(examDetail.SkillMatrixStatus);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get SkillMatrixStatus", description: "Returns the SkillMatrixStatus for a given ExamDetail"))
+.Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+app.MapGet("/api/ExamDetail/{id:int}/ReimbursementStatus", async (int id, ApiDbContext dbContext) =>
+{
+    var examDetail = await dbContext.ExamDetails.FindAsync(id);
+    if (examDetail == null)
+    {
+        return Results.NotFound("ExamDetail not found");
+    }
+
+    return Results.Ok(examDetail.ReimbursementStatus);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get ReimbursementStatus", description: "Returns the ReimbursementStatus for a given ExamDetail"))
+    .Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+// Minimal API endpoint
+app.MapGet("/api/Nomination/{id:int}/Details", async (int id, ApiDbContext dbContext) =>
+{
+    var nomination = await dbContext.Nominations.FindAsync(id);
+    if (nomination == null)
+    {
+        return Results.NotFound("Nomination not found");
+    }
+
+    var result = new
+    {
+        nomination.ManagerRecommendation,
+        nomination.IsDepartmentApproved,
+        nomination.IsLndApproved
+    };
+
+    return Results.Ok(result);
+})
+.WithMetadata(new SwaggerOperationAttribute(summary: "Get Nomination Details", description: "Returns ManagerRecommendation, IsDepartmentApproved, and IsLndApproved for a given Nomination"))
+.Produces(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+
+app.MapGet("/api/ExamDetail/{nominationId:int}/Details", async (int nominationId, ApiDbContext dbContext) =>
+{
+    var examDetail = await dbContext.ExamDetails
+        .Where(e => e.NominationId == nominationId)
+        .Select(e => new
+        {
+            e.Id,
+            e.NominationId,
+            e.MyCertificationId,
+            e.UploadCertificateStatus,
+            e.SkillMatrixStatus,
+            e.ReimbursementStatus,
+            e.InvoiceNumber
+        })
+        .FirstOrDefaultAsync();
+
+    if (examDetail == null)
+    {
+        return Results.NotFound("ExamDetail not found");
+    }
+
+    return Results.Ok(examDetail);
+})
+.WithMetadata(new SwaggerOperationAttribute(summary: "Get ExamDetail", description: "Fetches ExamDetail properties based on NominationId"))
+.Produces(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+
+
+app.MapPost("/api/ExamDetail/{id:int}/SkillMatrixStatus", async (int id, [FromBody] string skillMatrixStatus, ApiDbContext dbContext) =>
+{
+    var examDetail = await dbContext.ExamDetails.FindAsync(id);
+    if (examDetail == null)
+    {
+        return Results.NotFound("ExamDetail not found");
+    }
+
+    examDetail.SkillMatrixStatus = skillMatrixStatus;
+    examDetail.UpdatedAt = DateTime.UtcNow;
+
+    await dbContext.SaveChangesAsync();
+
+    return Results.Ok("SkillMatrixStatus updated successfully");
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Post SkillMatrixStatus", description: "Updates the SkillMatrixStatus for a given ExamDetail"))
+    .Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+app.MapPost("/api/ExamDetail/{id:int}/ReimbursementStatus", async (int id, [FromBody] string reimbursementStatus, ApiDbContext dbContext) =>
+{
+    var examDetail = await dbContext.ExamDetails.FindAsync(id);
+    if (examDetail == null)
+    {
+        return Results.NotFound("ExamDetail not found");
+    }
+
+    examDetail.ReimbursementStatus = reimbursementStatus;
+    examDetail.UpdatedAt = DateTime.UtcNow;
+
+    await dbContext.SaveChangesAsync();
+
+    return Results.Ok("ReimbursementStatus updated successfully");
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Post ReimbursementStatus", description: "Updates the ReimbursementStatus for a given ExamDetail"))
+    .Produces<bool>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
+
+
+
 
 app.UseCors("AllowReactApp");
 

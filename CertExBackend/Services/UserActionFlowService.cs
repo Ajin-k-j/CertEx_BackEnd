@@ -74,21 +74,19 @@ namespace CertExBackend.Services
         }
 
         
-/*        public async Task<bool> UploadCertificationAsync(int nominationId, ActionFlowMyCertificationDto certificationDto)
-        {
-            return await _repository.UploadCertificationAsync(nominationId, certificationDto);
-        }
-*/
+
 
         public async Task<bool> UploadCertificationAsync(ActionFlowMyCertificationDto certificationDto)
         {
             return await _repository.UploadCertificationAsync(certificationDto);
         }
-        public async Task<bool> PostInvoiceDetailsAsync(int nominationId, ActionFlowExamDetailDto examDetailDto)
-        {
-            return await _repository.PostInvoiceDetailsAsync(nominationId, examDetailDto);
-        }
 
+        public async Task<bool> PostInvoiceDetailsAsync(ActionFlowExamDetailDto examDetailDto)
+        {
+            {
+                return await _repository.PostInvoiceDetailsAsync(examDetailDto);
+            }
+        }
         public async Task DeleteCertificationAsync(int id)
         {
             var certification = await _repository.GetByIdAsync(id);

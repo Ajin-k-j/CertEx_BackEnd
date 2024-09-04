@@ -26,6 +26,8 @@ public class Employee
     public int AppRoleId { get; set; }
 
     public bool AwsAccountActive { get; set; } = false;
+    public string AWSCredentials { get; set; }
+    public string AWSAdminRemarks { get; set; }
 
     [Required]
     [EmailAddress]

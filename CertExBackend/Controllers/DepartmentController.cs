@@ -36,10 +36,10 @@ namespace CertExBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddDepartment(DepartmentDto departmentDto)
+        public async Task<ActionResult> AddDepartment(Department department)
         {
-            await _departmentService.AddDepartmentAsync(departmentDto);
-            return CreatedAtAction(nameof(GetDepartmentById), new { id = departmentDto.Id }, departmentDto);
+            await _departmentService.AddDepartmentAsync(department);
+            return CreatedAtAction(nameof(GetDepartmentById), new { id = department.Id }, department);
         }
 
         [HttpPut]

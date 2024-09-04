@@ -19,6 +19,9 @@ namespace CertExBackend.Mappings
             CreateMap<CertificationExam, ActionFlowNominationDto>()
                 .ForMember(dest => dest.NominationOpenDate, opt => opt.MapFrom(src => src.NominationOpenDate))
                 .ForMember(dest => dest.NominationCloseDate, opt => opt.MapFrom(src => src.NominationCloseDate));
+
+            CreateMap<ActionFlowExamDetailDto, ExamDetail>()
+          .ForMember(dest => dest.InvoiceUrl, opt => opt.MapFrom(src => src.Url));
         }
     }
 }
