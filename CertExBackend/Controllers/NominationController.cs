@@ -65,7 +65,7 @@ namespace CertExBackend.Controllers
             try
             {
                 await _nominationService.AddNominationAsync(nominationCreateDto);
-                return CreatedAtAction(nameof(GetNominationById), new { id = nominationCreateDto.Id }, nominationCreateDto);
+                return Ok("Nomination added successfully");
             }
             catch (Exception ex)
             {
