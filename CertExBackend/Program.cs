@@ -10,10 +10,21 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
+using Serilog;
+using Serilog.Events;
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) // Log to file with daily rolling
+    .CreateLogger();
+
+
+builder.Host.UseSerilog(); // Use Serilog for logging
 // Add services to the container.
 builder.Services.AddControllers();
 

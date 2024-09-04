@@ -31,27 +31,21 @@ namespace CertExBackend.Services
         public async Task<IEnumerable<CertificationExamDto>> GetAllCertificationExamsAsync()
         {
             var certificationExams = await _certificationExamRepository.GetAllCertificationExamsAsync();
+
+            // Map to DTOs
             var certificationExamDtos = _mapper.Map<IEnumerable<CertificationExamDto>>(certificationExams);
 
+            // Map provider name and tags
             foreach (var examDto in certificationExamDtos)
             {
-                // Fetch provider name using the CertificationExam model
                 var certificationExam = certificationExams.FirstOrDefault(exam => exam.Id == examDto.Id);
                 if (certificationExam != null)
                 {
-                    var provider = await _providerRepository.GetCertificationProviderByIdAsync(certificationExam.ProviderId);
-                    examDto.ProviderName = provider?.ProviderName ?? "Unknown";
-
-                    // Fetch tags related to the certification exam
-                    var certificationTags = await _certificationTagRepository.GetAllCertificationTagsAsync();
-                    var categoryTags = await _categoryTagRepository.GetAllCategoryTagsAsync();
-
-                    examDto.Tags = certificationTags
-                        .Where(ct => ct.CertificationId == certificationExam.Id)
-                        .Select(ct => ct.CategoryTagId)
-                        .Distinct()
-                        .Select(categoryTagId => categoryTags.FirstOrDefault(tag => tag.Id == categoryTagId)?.CategoryTagName)
+                    examDto.ProviderName = certificationExam.CertificationProvider?.ProviderName ?? "Unknown";
+                    examDto.Tags = certificationExam.CertificationTags
+                        .Select(ct => ct.CategoryTag?.CategoryTagName)
                         .Where(tagName => tagName != null)
+                        .Distinct()
                         .ToList();
                 }
             }
