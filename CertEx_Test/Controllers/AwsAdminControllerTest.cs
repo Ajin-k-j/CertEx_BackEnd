@@ -28,8 +28,8 @@ namespace CertEx_Test.Controllers
             var awsDetailsDto = new AwsAdminDetailsDto
             {
                 EmployeeId = 1,
-                AWSCredentials = "ValidCredentials",
-                AWSAdminRemarks = "ValidRemarks"
+                AWSCredentials = "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
+                AWSAdminRemarks = "Go to this link and register for the exam"
             };
 
             // Act
@@ -72,8 +72,8 @@ namespace CertEx_Test.Controllers
             var awsDetailsDto = new AwsAdminDetailsDto
             {
                 EmployeeId = 1,
-                AWSCredentials = "ValidCredentials",
-                AWSAdminRemarks = "ValidRemarks"
+                AWSCredentials = "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
+                AWSAdminRemarks = "Go to this link and register for the exam"
             };
 
             // Act

@@ -38,10 +38,8 @@ namespace CertExBackend.Controllers
         [HttpPost]
         public async Task<ActionResult> AddCertificationExam(CertificationExam certificationExam)
         {
-            // Assuming you have logic to set CreatedBy and CreatedDate
-            // For example: certificationExam.CreatedBy = GetCurrentUserId();
             await _certificationExamService.AddCertificationExamAsync(certificationExam);
-            return CreatedAtAction(nameof(GetCertificationExamById), new { id = certificationExam.Id }, certificationExam);
+            return Ok("Certification Added");
         }
 
         [HttpPut]
