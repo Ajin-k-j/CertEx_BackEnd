@@ -79,9 +79,17 @@ namespace CertExBackend.Services
 
         public async Task UpdateEmployeeAsync(EmployeeDto employeeDto)
         {
-            var employee = _mapper.Map<Employee>(employeeDto);
-            await _employeeRepository.UpdateEmployeeAsync(employee);
+            var existingEmployee = await _employeeRepository.GetEmployeeByIdAsync(employeeDto.Id);
+            if (existingEmployee == null)
+            {
+                throw new Exception("Employee not found.");
+            }
+
+            _mapper.Map(employeeDto, existingEmployee); // Update existing entity with new data
+
+            await _employeeRepository.UpdateEmployeeAsync(existingEmployee);
         }
+
 
         public async Task DeleteEmployeeAsync(int id)
         {

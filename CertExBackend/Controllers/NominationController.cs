@@ -1,6 +1,7 @@
 ﻿using CertExBackend.DTOs;
 using CertExBackend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CertExBackend.Controllers
 {
@@ -9,28 +10,47 @@ namespace CertExBackend.Controllers
     public class NominationController : ControllerBase
     {
         private readonly INominationService _nominationService;
+        private readonly ILogger<NominationController> _logger;
 
-        public NominationController(INominationService nominationService)
+        public NominationController(INominationService nominationService, ILogger<NominationController> logger)
         {
             _nominationService = nominationService;
+            _logger = logger;
         }
 
         [HttpGet("allnominations")]
         public async Task<ActionResult<IEnumerable<NominationDto>>> AllNominations()
         {
-            var nominations = await _nominationService.GetAllNominationsAsync();
-            return Ok(nominations);
+            try
+            {
+                var nominations = await _nominationService.GetAllNominationsAsync();
+                return Ok(nominations);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching all nominations.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<NominationDto>> GetNominationById(int id)
         {
-            var nomination = await _nominationService.GetNominationByIdAsync(id);
-            if (nomination == null)
+            try
             {
-                return NotFound(new { Message = $"Nomination with ID {id} not found." });
+                var nomination = await _nominationService.GetNominationByIdAsync(id);
+                if (nomination == null)
+                {
+                    _logger.LogWarning("Nomination with ID {Id} not found.", id);
+                    return NotFound(new { Message = $"Nomination with ID {id} not found." });
+                }
+                return Ok(nomination);
             }
-            return Ok(nomination);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching nomination by ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPost]
@@ -38,6 +58,7 @@ namespace CertExBackend.Controllers
         {
             if (nominationCreateDto == null)
             {
+                _logger.LogWarning("Nomination data is required.");
                 return BadRequest("Nomination data is required.");
             }
 
@@ -48,7 +69,8 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while adding nomination.");
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -57,12 +79,14 @@ namespace CertExBackend.Controllers
         {
             if (nominationDto == null)
             {
+                _logger.LogWarning("Nomination data is required.");
                 return BadRequest("Nomination data is required.");
             }
 
             var existingNomination = await _nominationService.GetNominationByIdAsync(nominationDto.Id);
             if (existingNomination == null)
             {
+                _logger.LogWarning("Nomination with ID {Id} not found.", nominationDto.Id);
                 return NotFound(new { Message = $"Nomination with ID {nominationDto.Id} not found." });
             }
 
@@ -73,7 +97,8 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while updating nomination with ID {Id}.", nominationDto.Id);
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -83,12 +108,12 @@ namespace CertExBackend.Controllers
             try
             {
                 await _nominationService.ApproveDepartmentAsync(id);
-                /*return Ok("Nomination Approved by Department");*/
                 return Redirect($"http://localhost:5173/message?message=Nomination_approved.&success=true");
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while approving department nomination with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -98,12 +123,12 @@ namespace CertExBackend.Controllers
             try
             {
                 await _nominationService.ApproveLndAsync(id);
-                /*return Ok("Nomination Approved by L&D");*/
                 return Redirect($"http://localhost:5173/message?message=Nomination_approved.&success=true");
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while approving L&D nomination with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -117,7 +142,8 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while rejecting department nomination with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -131,10 +157,10 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while rejecting L&D nomination with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
             }
         }
-
 
         [HttpGet("pendingActions/Lnd")]
         public async Task<IActionResult> GetPendingLndApprovals()
@@ -146,6 +172,7 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error occurred while fetching pending L&D approvals.");
                 return StatusCode(500, new { message = ex.Message });
             }
         }
@@ -160,6 +187,7 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error occurred while fetching pending department approvals for department ID {DepartmentId}.", departmentId);
                 return StatusCode(500, new { message = ex.Message });
             }
         }
@@ -172,6 +200,7 @@ namespace CertExBackend.Controllers
                 var existingNomination = await _nominationService.GetNominationByIdAsync(id);
                 if (existingNomination == null)
                 {
+                    _logger.LogWarning("Nomination with ID {Id} not found.", id);
                     return NotFound(new { Message = $"Nomination with ID {id} not found." });
                 }
 
@@ -180,7 +209,8 @@ namespace CertExBackend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, "Error occurred while deleting nomination with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
             }
         }
     }
