@@ -10,12 +10,18 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
+<<<<<<< Updated upstream
 <<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 using Serilog;
 using Serilog.Events;
 >>>>>>> 49206d1ad572c907db2644e61e777ac973183647
