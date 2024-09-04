@@ -10,14 +10,11 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
-<<<<<<< HEAD
+using Serilog;
+using Serilog.Events;
 using CertExBackend.Repositories.Interfaces;
 using CertExBackend.Services.Interfaces;
 using CertExBackend;
-=======
-using Serilog;
-using Serilog.Events;
->>>>>>> 49206d1ad572c907db2644e61e777ac973183647
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);

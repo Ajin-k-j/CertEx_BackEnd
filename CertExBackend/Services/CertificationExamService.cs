@@ -42,7 +42,7 @@ namespace CertExBackend.Services
                 if (certificationExam != null)
                 {
                     examDto.ProviderName = certificationExam.CertificationProvider?.ProviderName ?? "Unknown";
-                    examDto.Tags = certificationExam.CertificationTags
+                    examDto.Tags = certificationExam.CertificationTag
                         .Select(ct => ct.CategoryTag?.CategoryTagName)
                         .Where(tagName => tagName != null)
                         .Distinct()
