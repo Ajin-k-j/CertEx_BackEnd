@@ -42,6 +42,10 @@ namespace CertExBackend.Repository
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<Employee> GetEmployeeByUsernameAsync(string username)
+        {
+            return await _dbContext.Employees.FirstOrDefaultAsync(e => e.SSOEmployeeId == username);
+        }
         public async Task UpdateEmployeeAsync(Employee employee)
         {
             _dbContext.Employees.Update(employee);

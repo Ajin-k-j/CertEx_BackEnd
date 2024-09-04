@@ -32,14 +32,17 @@ namespace CertExBackend.Services
             }
         }
 
-        public async Task SendEmailWithCcAsync(string to, string subject, string body, string cc)
+        public async Task SendEmailWithCcAsync(string to, string subject, string body, string replyTo)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Nomination System", _configuration["EmailSettings:From"]));
             message.To.Add(new MailboxAddress("", to));
-            message.Cc.Add(new MailboxAddress("", cc)); // Add CC address
+            // No need to add CC header
             message.Subject = subject;
             message.Body = new TextPart("html") { Text = body };
+
+            // Set the Reply-To header to the provided CC email address
+            message.ReplyTo.Add(new MailboxAddress("", replyTo));
 
             using (var client = new SmtpClient())
             {
@@ -49,5 +52,6 @@ namespace CertExBackend.Services
                 await client.DisconnectAsync(true);
             }
         }
+
     }
 }

@@ -35,7 +35,7 @@
         <p>Hi {managerName},</p>
         <p>The employee <strong>{employeeName}</strong> has submitted a nomination for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation Description:</strong></p>
+        <p><strong>Employee Remarks:</strong></p>
         <blockquote style='border-left: 4px solid #007BFF; padding-left: 10px; margin: 10px 0; font-style: italic;'>{motivationDescription}</blockquote>
         <p>To review this nomination, please click the button below:</p>
         <a href='{approvalUrl}' style='display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007BFF; text-decoration: none; border-radius: 4px;'>Review Nomination</a>
@@ -60,7 +60,7 @@
         <p>A nomination has been submitted for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <p><strong>Manager Name:</strong> {managerName}</p>
         <p><strong>Manager Recommendation:</strong> {managerRecommendation}</p>
         <p><strong>Manager Remarks:</strong> {managerRemarks}</p>
@@ -100,7 +100,7 @@
         <p>A nomination for the certification '<strong>{certificationName}</strong>' is awaiting your final approval.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <p><strong>Manager Name:</strong> {managerName}</p>
         <p><strong>Manager Recommendation:</strong> {managerRecommendation}</p>
         <p><strong>Manager Remarks:</strong> {managerRemarks}</p>
@@ -196,7 +196,7 @@
         <p>A nomination has been submitted for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <div style='margin-top: 20px;'>
             <a href='{approveUrl}' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
             <a href='{rejectUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
