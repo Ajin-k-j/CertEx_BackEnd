@@ -12,9 +12,8 @@ using CertExBackend.DTOs;
 using CertExBackend.Model;
 using Serilog;
 using Serilog.Events;
-using CertExBackend.Repositories.Interfaces;
 using CertExBackend.Services.Interfaces;
-using CertExBackend;
+using CertExBackend.Repositories.Interfaces;
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,13 +63,11 @@ builder.Services.AddAutoMapper(typeof(MyCertificationProfile));
 builder.Services.AddAutoMapper(typeof(NominationProfile));
 builder.Services.AddAutoMapper(typeof(PendingNominationProfile));
 builder.Services.AddAutoMapper(typeof(RoleProfile));
-/*builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));*/
+builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));
 builder.Services.AddAutoMapper(typeof(DepartmentStatsProfile));
 builder.Services.AddAutoMapper(typeof(AwsStatsProfile));
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(AwsNominationProfile).Assembly);
-builder.Services.AddAutoMapper(typeof(EmployeeCertificationProfile));
-builder.Services.AddAutoMapper(typeof(LDNominationMappingProfile));
 
 
 
@@ -96,10 +93,7 @@ builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
 builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
 builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
 builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
-builder.Services.AddScoped<IEmployeeCertificationRepository, EmployeeCertificationRepository>();
 builder.Services.AddScoped<ILDNominationRepository, LDNominationRepository>();
-
-
 
 
 
@@ -133,8 +127,6 @@ builder.Services.AddScoped<ILDNominationService, LDNominationService>();
 
 
 
-
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -147,7 +139,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 
 app.UseHttpsRedirection();
