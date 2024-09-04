@@ -15,6 +15,7 @@ namespace CertExBackend.Model
         [Required]
         [MaxLength(500)]
         public string Url { get; set; }
+ 
 
         public DateTime FromDate { get; set; }
         public DateTime ExpiryDate { get; set; }
@@ -31,3 +32,4 @@ namespace CertExBackend.Model
         public ICollection<ExamDetail> ExamDetails { get; set; }
     }
 }
+

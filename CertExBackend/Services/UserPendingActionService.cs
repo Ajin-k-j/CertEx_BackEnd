@@ -15,8 +15,8 @@ namespace CertExBackend.Services
 
         public Task<IEnumerable<UserPendingActionDto>> GetUserPendingActionsAsync()
         {
-            // Hardcoding EmployeeId as 1
-            int employeeId = 2;
+            // Hardcoding EmployeeId as 3
+            int employeeId = 3;
             return _repository.GetUserPendingActionsAsync(employeeId);
         }
     }
