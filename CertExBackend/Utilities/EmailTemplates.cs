@@ -35,7 +35,7 @@
         <p>Hi {managerName},</p>
         <p>The employee <strong>{employeeName}</strong> has submitted a nomination for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation Description:</strong></p>
+        <p><strong>Employee Remarks:</strong></p>
         <blockquote style='border-left: 4px solid #007BFF; padding-left: 10px; margin: 10px 0; font-style: italic;'>{motivationDescription}</blockquote>
         <p>To review this nomination, please click the button below:</p>
         <a href='{approvalUrl}' style='display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007BFF; text-decoration: none; border-radius: 4px;'>Review Nomination</a>
@@ -49,7 +49,17 @@
 
 
 
-        public static string CreateDepartmentApprovalEmail(string certificationName, string employeeName, string plannedExamMonth, string motivationDescription, string managerName, string managerRecommendation, string managerRemarks, string approveUrl, string rejectUrl)
+        public static string CreateDepartmentApprovalEmail(
+     string certificationName,
+     string employeeName,
+     string plannedExamMonth,
+     string motivationDescription,
+     string managerName,
+     string managerRecommendation,
+     string managerRemarks,
+     string approveUrl,
+     string rejectUrl
+ )
         {
             return $@"
 <html>
@@ -60,7 +70,7 @@
         <p>A nomination has been submitted for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <p><strong>Manager Name:</strong> {managerName}</p>
         <p><strong>Manager Recommendation:</strong> {managerRecommendation}</p>
         <p><strong>Manager Remarks:</strong> {managerRemarks}</p>
@@ -68,12 +78,14 @@
             <a href='{approveUrl}' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
             <a href='{rejectUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
         </div>
+        <p style='margin-top: 20px;'>If you have any questions or require further information, please feel free to reply to this email. Your response will be directed to the manager who has recommended this nomination for further assistance.</p>
         <p>Thank you,<br>Team CertEx</p>
     </div>
 </body>
 </html>
 ";
         }
+
 
 
         public static string CreateLndApprovalEmail(
@@ -86,7 +98,8 @@
     string managerRemarks,
     bool isDepartmentApproved,
     string approveUrl,
-    string rejectUrl
+    string rejectUrl,
+    string departmentHeadEmail // Add department head email as a parameter
 )
         {
             var departmentApprovalStatus = isDepartmentApproved ? "approved" : "rejected";
@@ -100,7 +113,7 @@
         <p>A nomination for the certification '<strong>{certificationName}</strong>' is awaiting your final approval.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <p><strong>Manager Name:</strong> {managerName}</p>
         <p><strong>Manager Recommendation:</strong> {managerRecommendation}</p>
         <p><strong>Manager Remarks:</strong> {managerRemarks}</p>
@@ -109,12 +122,14 @@
             <a href='{approveUrl}' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
             <a href='{rejectUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
         </div>
+        <p style='margin-top: 20px;'>If you have any questions or need further information, please reply to this email. Your reply will be directed to the Department Head at <a href='mailto:{departmentHeadEmail}'>{departmentHeadEmail}</a>.</p>
         <p>Thank you,<br>Team CertEx</p>
     </div>
 </body>
 </html>
 ";
         }
+
 
         public static string CreateAwsAdminEmail(
     string certificationName,
@@ -138,12 +153,14 @@
         <div style='margin-top: 20px;'>
             <a href='{awsCredentialsUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 4px;'>Provide AWS Credentials</a>
         </div>
+        <p>If you have any queries, please reply to this email and you can start a conversation with the L&D Admin.</p>
         <p>Thank you,<br>Team CertEx</p>
     </div>
 </body>
 </html>
 ";
         }
+
 
 
         public static string CreateAwsCredentialsEmail(
@@ -196,11 +213,51 @@
         <p>A nomination has been submitted for the certification '<strong>{certificationName}</strong>'.</p>
         <p><strong>Employee:</strong> {employeeName}</p>
         <p><strong>Planned Exam Month:</strong> {plannedExamMonth}</p>
-        <p><strong>Motivation:</strong> {motivationDescription}</p>
+        <p><strong>Employee Remarks:</strong> {motivationDescription}</p>
         <div style='margin-top: 20px;'>
             <a href='{approveUrl}' style='display: inline-block; padding: 10px 20px; margin-right: 10px; text-decoration: none; color: #fff; background-color: #28a745; border-radius: 4px;'>Approve</a>
             <a href='{rejectUrl}' style='display: inline-block; padding: 10px 20px; text-decoration: none; color: #fff; background-color: #dc3545; border-radius: 4px;'>Reject</a>
         </div>
+        <p>Thank you,<br>Team CertEx</p>
+    </div>
+</body>
+</html>
+";
+        }
+
+
+        public static string CreateManagerApprovalNotificationEmail(string managerName, string employeeName, string certificationName)
+        {
+            return $@"
+<html>
+<body style='font-family: Arial, sans-serif; color: #333;'>
+    <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
+        <h2 style='color: #007BFF;'>Nomination Approved by Department Head</h2>
+        <p>Hi {managerName},</p>
+        <p>We are pleased to inform you that the nomination for the certification '<strong>{certificationName}</strong>' submitted by your team member <strong>{employeeName}</strong> has been approved by the Department Head.</p>
+        <p>Thank you for your contribution and support in this process.</p>
+        <p>Best regards,<br>Team CertEx</p>
+    </div>
+</body>
+</html>
+";
+        }
+
+
+        public static string CreateLndRejectionNotificationEmail(string certificationName, string employeeName, string departmentHeadName, string departmentHeadEmail)
+        {
+            return $@"
+<html>
+<body style='font-family: Arial, sans-serif; color: #333;'>
+    <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
+        <h2 style='color: #007BFF;'>Nomination Rejected by Department Head</h2>
+        <p>Hi,</p>
+        <p>Please be informed that the nomination for the certification '<strong>{certificationName}</strong>' has been rejected by the Department Head.</p>
+        <p><strong>Employee:</strong> {employeeName}</p>
+        <p><strong>Department Head:</strong> {departmentHeadName}</p>
+        <p><strong>Department Head Email:</strong> {departmentHeadEmail}</p>
+        <p><strong>Certification Name:</strong> {certificationName}</p>
+        <p>For further details or actions, please refer to the nomination system.</p>
         <p>Thank you,<br>Team CertEx</p>
     </div>
 </body>

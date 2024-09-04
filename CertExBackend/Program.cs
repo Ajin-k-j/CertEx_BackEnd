@@ -10,14 +10,28 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+=======
+using Serilog;
+using Serilog.Events;
+>>>>>>> 49206d1ad572c907db2644e61e777ac973183647
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) // Log to file with daily rolling
+    .CreateLogger();
+
+
+builder.Host.UseSerilog(); // Use Serilog for logging
 // Add services to the container.
 builder.Services.AddControllers();
 

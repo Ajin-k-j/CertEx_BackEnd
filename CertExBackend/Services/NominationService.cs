@@ -14,6 +14,7 @@ namespace CertExBackend.Services
         private readonly IEmployeeRepository _employeeRepository;
         private readonly ICertificationExamService _certificationExamService;
         private readonly IMapper _mapper;
+        
 
         public NominationService(
             INominationRepository nominationRepository,
@@ -28,6 +29,8 @@ namespace CertExBackend.Services
             _certificationExamService = certificationExamService;
             _mapper = mapper;
         }
+
+        
 
         public async Task<IEnumerable<NominationDto>> GetAllNominationsAsync()
         {
@@ -84,7 +87,7 @@ namespace CertExBackend.Services
                 {
                     var managerEmail = manager.Email;
                     var managerName = manager.FirstName;
-                    var managerSubject = "Review Nomination";
+                    var managerSubject = "Review Nomination | CertEx";
 
                     // Generate the approval URL with query parameters
                     var queryParams = new Dictionary<string, string>
@@ -141,8 +144,8 @@ namespace CertExBackend.Services
             }
 
             // Send email to department head
-            var departmentHeadEmail = "ajinkjajin@gmail.com"; // Placeholder; Replace with actual retrieval logic
-            /*var departmentHeadName = "Department Head";*/ // Placeholder; Replace with actual retrieval logic
+            var departmentHeadEmail = "email.certex@gmail.com"; // Placeholder; Replace with actual retrieval logic
+            var managerEmail = employee.Manager.Email; // Assume the manager's email is stored in the Manager property of the employee
 
             var approvalUrl = $"https://localhost:7209/api/Nomination/approve/department/{nomination.Id}";
             var rejectUrl = $"https://localhost:7209/api/Nomination/reject/department/{nomination.Id}";
@@ -160,10 +163,11 @@ namespace CertExBackend.Services
             );
 
             var subject = "Nomination Awaiting Your Approval";
-            await _emailService.SendEmailAsync(departmentHeadEmail, subject, emailBody);
+            await _emailService.SendEmailWithCcAsync(departmentHeadEmail, subject, emailBody, managerEmail);
 
             return true;
         }
+
 
 
 
@@ -207,9 +211,10 @@ namespace CertExBackend.Services
                 );
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
-                // Send email to L&D team
-                var ldEmail = "ajinkjajin@gmail.com"; // Replace with actual L&D email retrieval logic
-                var ldSubject = "Nomination Awaiting Your Final Approval";
+                // Send email to L&D team with Department Head email as Reply-To
+                var ldEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D email retrieval logic
+                var departmentHeadEmail = "email.certex@gmail.com"; // Replace with actual department head email retrieval logic
+                var ldSubject = "Nomination Awaiting L&D Approval";
                 var ldBody = EmailTemplates.CreateLndApprovalEmail(
                     certificationExamDto.CertificationName,
                     $"{employee.FirstName} {employee.LastName}",
@@ -220,10 +225,21 @@ namespace CertExBackend.Services
                     nomination.ManagerRemarks,
                     nomination.IsDepartmentApproved,
                     "https://localhost:7209/api/Nomination/approve/lnd/" + nomination.Id,
-                    "https://localhost:7209/api/Nomination/reject/lnd/" + nomination.Id
+                    "https://localhost:7209/api/Nomination/reject/lnd/" + nomination.Id,
+                    departmentHeadEmail // Pass department head email to the template
                 );
 
-                await _emailService.SendEmailAsync(ldEmail, ldSubject, ldBody);
+                await _emailService.SendEmailWithCcAsync(ldEmail, ldSubject, ldBody, departmentHeadEmail);
+
+                // Send email to manager
+                var managerEmail = employee.Manager.Email; // Retrieve manager's email
+                var managerSubject = "Nomination Approved by Department Head";
+                var managerBody = EmailTemplates.CreateManagerApprovalNotificationEmail(
+                    employee.Manager.FirstName,
+                    $"{employee.FirstName} {employee.LastName}",
+                    certificationExamDto.CertificationName
+                );
+                await _emailService.SendEmailAsync(managerEmail, managerSubject, managerBody);
             }
         }
 
@@ -258,7 +274,8 @@ namespace CertExBackend.Services
                 // Check if the certification provider is AWS and employee does not have an active AWS account
                 if (certificationExamDto.ProviderName.Equals("AWS", StringComparison.OrdinalIgnoreCase) && !employee.AwsAccountActive)
                 {
-                    var awsAdminEmail = "ajinkjajin@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                    var awsAdminEmail = "kalon2k23@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                    var lndAdminEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D admin email retrieval logic
                     var awsAdminSubject = "AWS Certification: Action Required";
 
                     // Encode query parameters to be URL safe
@@ -282,11 +299,10 @@ namespace CertExBackend.Services
                         awsAdminUrl // URL to the React component with all relevant info
                     );
 
-                    await _emailService.SendEmailAsync(awsAdminEmail, awsAdminSubject, awsAdminBody);
+                    await _emailService.SendEmailWithCcAsync(awsAdminEmail, awsAdminSubject, awsAdminBody, lndAdminEmail);
                 }
             }
         }
-
 
 
 
@@ -307,12 +323,30 @@ namespace CertExBackend.Services
                     throw new Exception("Employee or Certification exam not found.");
                 }
 
+                // Send email to employee
                 var employeeEmail = employee.Email;
                 var employeeSubject = "Nomination Rejected by Department Head";
-                var employeeBody = EmailTemplates.CreateStatusUpdateEmail(certificationExamDto.CertificationName, "rejected by the Department Head", employee.FirstName);
+                var employeeBody = EmailTemplates.CreateStatusUpdateEmail(
+                    certificationExamDto.CertificationName,
+                    "rejected by the Department Head",
+                    employee.FirstName
+                );
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
+
+                // Send email to L&D team
+                var ldEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D email retrieval logic
+                var ldSubject = "Nomination Rejected by Department Head";
+                var ldBody = EmailTemplates.CreateLndRejectionNotificationEmail(
+                    certificationExamDto.CertificationName,
+                    $"{employee.FirstName} {employee.LastName}",
+                    $"{employee.Manager.FirstName} {employee.Manager.LastName}", // Assuming Manager is the Department Head
+                    employee.Manager.Email // Department Head Email
+                );
+
+                await _emailService.SendEmailWithCcAsync(ldEmail, ldSubject, ldBody, employee.Manager.Email); // Using the SendEmailWithCcAsync to set the Reply-To
             }
         }
+
 
         public async Task RejectLndAsync(int id)
         {

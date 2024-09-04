@@ -17,7 +17,9 @@ namespace CertExBackend.Repository
         public async Task<IEnumerable<CertificationExam>> GetAllCertificationExamsAsync()
         {
             return await _dbContext.CertificationExams
-                .Include(e => e.CertificationTags) // Eager loading
+                .Include(e => e.CertificationTags)
+                .ThenInclude(ct => ct.CategoryTag) // Assuming CategoryTag is a related entity
+                .Include(e => e.CertificationProvider) // Include the CertificationProvider
                 .ToListAsync();
         }
 
