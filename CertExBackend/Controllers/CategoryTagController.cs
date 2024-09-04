@@ -39,7 +39,7 @@ namespace CertExBackend.Controllers
         public async Task<ActionResult> AddCategoryTag(CategoryTagDto categoryTagDto)
         {
             await _categoryTagService.AddCategoryTagAsync(categoryTagDto);
-            return CreatedAtAction(nameof(GetCategoryTagById), new { id = categoryTagDto.Id }, categoryTagDto);
+            return Ok("Category tag created successfully.");
         }
 
         [HttpPut]
