@@ -10,21 +10,12 @@ using CertExBackend.Repositories;
 using CertExBackend.Mapping;
 using CertExBackend.DTOs;
 using CertExBackend.Model;
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 using Serilog;
 using Serilog.Events;
->>>>>>> 49206d1ad572c907db2644e61e777ac973183647
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
@@ -314,7 +305,33 @@ app.MapPost("/api/ExamDetail/{id:int}/ReimbursementStatus", async (int id, [From
     .Produces<bool>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status404NotFound);
 
+app.MapGet("/api/Nomination/{id:int}/ExamDate", async (int id, ApiDbContext dbContext) =>
+{
+    var nomination = await dbContext.Nominations.FindAsync(id);
+    if (nomination == null)
+    {
+        return Results.NotFound("Nomination not found");
+    }
 
+    return Results.Ok(nomination.ExamDate);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get ExamDate", description: "Returns the ExamDate for a given Nomination"))
+    .Produces<DateTime?>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status404NotFound);
+
+app.MapGet("/api/Nomination/{id:int}/ExamStatus", async (int id, ApiDbContext dbContext) =>
+{
+    var nomination = await dbContext.Nominations.FindAsync(id);
+    if (nomination == null)
+    {
+        return Results.NotFound("Nomination not found");
+    }
+
+    return Results.Ok(nomination.ExamStatus);
+})
+    .WithMetadata(new SwaggerOperationAttribute(summary: "Get ExamStatus", description: "Returns the ExamStatus for a given Nomination"))
+    .Produces<string>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status404NotFound);
 
 
 app.UseCors("AllowReactApp");
