@@ -9,5 +9,6 @@ namespace CertExBackend.Repository.IRepository
         Task AddFinancialYearAsync(FinancialYear financialYear);
         Task UpdateFinancialYearAsync(FinancialYear financialYear);
         Task DeleteFinancialYearAsync(int id);
+        Task<FinancialYear> GetFinancialYearForDateAsync(DateTime date);
     }
 }

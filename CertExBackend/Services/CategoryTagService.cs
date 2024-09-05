@@ -37,9 +37,22 @@ namespace CertExBackend.Services
 
         public async Task UpdateCategoryTagAsync(CategoryTagDto categoryTagDto)
         {
-            var categoryTag = _mapper.Map<CategoryTag>(categoryTagDto);
-            await _categoryTagRepository.UpdateCategoryTagAsync(categoryTag);
+            // Retrieve the existing category tag from the database
+            var existingCategoryTag = await _categoryTagRepository.GetCategoryTagByIdAsync(categoryTagDto.Id);
+
+            // Check if the existing category tag was found
+            if (existingCategoryTag == null)
+            {
+                throw new Exception($"CategoryTag with ID {categoryTagDto.Id} not found.");
+            }
+
+            // Map the updated values from the DTO to the existing entity
+            _mapper.Map(categoryTagDto, existingCategoryTag);
+
+            // Update the entity in the repository
+            await _categoryTagRepository.UpdateCategoryTagAsync(existingCategoryTag);
         }
+
 
         public async Task DeleteCategoryTagAsync(int id)
         {

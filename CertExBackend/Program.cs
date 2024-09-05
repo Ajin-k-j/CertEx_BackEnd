@@ -12,6 +12,8 @@ using CertExBackend.DTOs;
 using CertExBackend.Model;
 using Serilog;
 using Serilog.Events;
+using CertExBackend.Repositories.Interfaces;
+using CertExBackend.Services.Interfaces;
 /*using CertExBackend.Interface;*/
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,6 +94,7 @@ builder.Services.AddScoped<ILndBarGraphRepository, LndBarGraphRepository>();
 builder.Services.AddScoped<IDuBarGraphRepository, DuBarGraphRepository>();
 builder.Services.AddScoped<IAwsBarGraphRepository, AwsBarGraphRepository>();
 builder.Services.AddScoped<IUserPendingActionRepository, UserPendingActionRepository>();
+builder.Services.AddScoped<ILDNominationRepository, LDNominationRepository>();
 
 
 
@@ -122,6 +125,8 @@ builder.Services.AddScoped<IAwsStatsService, AwsStatsService>();
 builder.Services.AddScoped<IDepartmentStatsService, DepartmentStatsService>();
 builder.Services.AddScoped<IDepartmentNominationService, DepartmentNominationService>();
 builder.Services.AddScoped<IAwsNominationService, AwsNominationService>();
+builder.Services.AddScoped<ILDNominationService, LDNominationService>();
+builder.Services.AddScoped<IEmployeeCertificationService, EmployeeCertificationService>();
 
 
 
