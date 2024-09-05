@@ -56,6 +56,6 @@ namespace CertExBackend.Model
         public Employee Employee { get; set; }
 
         [JsonIgnore]
-        public ExamDetail ExamDetail { get; set; } 
+        public ExamDetail ExamDetail{ get; set; } 
     }
 }
