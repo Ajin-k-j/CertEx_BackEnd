@@ -144,7 +144,7 @@ namespace CertExBackend.Services
             }
 
             // Send email to department head
-            var departmentHeadEmail = "email.certex@gmail.com"; // Placeholder; Replace with actual retrieval logic
+            var departmentHeadEmail = "errorat3@gmail.com"; // Placeholder; Replace with actual retrieval logic
             var managerEmail = employee.Manager.Email; // Assume the manager's email is stored in the Manager property of the employee
 
             var approvalUrl = $"https://localhost:7209/api/Nomination/approve/department/{nomination.Id}";
@@ -212,8 +212,8 @@ namespace CertExBackend.Services
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
                 // Send email to L&D team with Department Head email as Reply-To
-                var ldEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D email retrieval logic
-                var departmentHeadEmail = "email.certex@gmail.com"; // Replace with actual department head email retrieval logic
+                var ldEmail = "kalon2k23@gmail.com"; // Replace with actual L&D email retrieval logic
+                var departmentHeadEmail = "errorat3@gmail.com"; // Replace with actual department head email retrieval logic
                 var ldSubject = "Nomination Awaiting L&D Approval";
                 var ldBody = EmailTemplates.CreateLndApprovalEmail(
                     certificationExamDto.CertificationName,
@@ -274,8 +274,8 @@ namespace CertExBackend.Services
                 // Check if the certification provider is AWS and employee does not have an active AWS account
                 if (certificationExamDto.ProviderName.Equals("AWS", StringComparison.OrdinalIgnoreCase) && !employee.AwsAccountActive)
                 {
-                    var awsAdminEmail = "kalon2k23@gmail.com"; // Replace with actual AWS admin email retrieval logic
-                    var lndAdminEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D admin email retrieval logic
+                    var awsAdminEmail = "sahirnisar6606@gmail.com"; // Replace with actual AWS admin email retrieval logic
+                    var lndAdminEmail = "kalon2k23@gmail.com"; // Replace with actual L&D admin email retrieval logic
                     var awsAdminSubject = "AWS Certification: Action Required";
 
                     // Encode query parameters to be URL safe
@@ -334,7 +334,7 @@ namespace CertExBackend.Services
                 await _emailService.SendEmailAsync(employeeEmail, employeeSubject, employeeBody);
 
                 // Send email to L&D team
-                var ldEmail = "ajinkj.experion@gmail.com"; // Replace with actual L&D email retrieval logic
+                var ldEmail = "kalon2k23@gmail.com"; // Replace with actual L&D email retrieval logic
                 var ldSubject = "Nomination Rejected by Department Head";
                 var ldBody = EmailTemplates.CreateLndRejectionNotificationEmail(
                     certificationExamDto.CertificationName,
